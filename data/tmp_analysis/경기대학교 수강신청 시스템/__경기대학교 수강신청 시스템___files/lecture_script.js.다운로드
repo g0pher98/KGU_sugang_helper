@@ -1,0 +1,695 @@
+//----------------------------------------------------------------------------
+//S : 빠른 수강신청 콤보
+//----------------------------------------------------------------------------
+// 대학
+function loadFastUnivCombo( lang ){
+	var js_univ_data 	= eval("DATA.univ.rows");
+	var _html 			= "";
+	var _init_data 		= "00000";
+	var _init_msg 		= "선택하세요";
+	var _loading_msg 	= "Loading...";
+	var _no_data_msg 	= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg		= "Please Select";
+		_no_data_msg 	= "No Data Found...";
+	}
+	
+	$("#univ_cd").empty();
+	
+	if(js_univ_data.length > 0 ){
+		_html += "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+		for(var i=0; i<js_univ_data.length; i++){
+			if( lang == "en" ){
+				_html += "<option value=\""+js_univ_data[i].code+"\" \>"+js_univ_data[i].ename+"</option>";
+			}else{
+				_html += "<option value=\""+js_univ_data[i].code+"\" \>"+js_univ_data[i].kname+"</option>";
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#univ_cd").append( _html );
+	
+	document.form.univ_cd.options[1].selected = true;
+}
+
+function changeGwamokCd(){
+	document.form.isu_cd.value = "00000";
+	$("#span_isu_cd").hide(); 	//document.all.span_isu_cd.style.display = "none";		
+	if (!(event.keyCode > 47 && event.keyCode < 58)) event.returnValue = false;
+}
+function changeUniv(){
+	document.form.gwamok_cd2.focus();
+}
+// 저장 후, 이수구분콤보 불러오기
+function loadFastIsuCombo(isu_cd, isu_cd2){	
+	$.ajax({
+		type: "POST",
+		url: urlIsuCombo,
+		data:{isu_cd:isu_cd, isu_cd2:isu_cd2 },
+		async:false,
+		success: function(data) {
+			var tmp 		= eval("("+data+")");
+			var real_data 	= eval("tmp.rows");
+			
+			var _html 			= "";
+			var _init_data 		= "00000";
+			var _init_msg 		= "선택하세요";
+			var _loading_msg 	= "Loading...";
+			var _no_data_msg 	= "데이터가 존재하지 않습니다.";
+			if( lang == "en" ){
+				_init_msg		= "Please Select";
+				_no_data_msg 	= "No Data Found...";
+			}
+			
+			$("#isu_cd").empty();
+			
+			if(real_data.length > 0 ){
+				_html += "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+				for(var i=0; i<real_data.length; i++){
+					_html += "<option value=\""+real_data[i].code+"\" \>"+real_data[i].name+"</option>";
+				}
+			}else{
+				_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+			}
+			$("#isu_cd").append( _html );
+		},
+		error: function(req, status, error){
+			alert("code:"+req.status+"\n"+"message:"+req.responseText+"\n"+"error:"+error);
+		}
+	});
+}
+//----------------------------------------------------------------------------
+//E : 빠른 수강신청 콤보
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// S : 교양
+// 기존 : GetAreaByCampus() 변경
+//----------------------------------------------------------------------------
+//캠퍼스 주야 구분을  가지고 교양영역을 가져오기   | 기존 : GetAreaByCampus()
+function loadGyoyangAreaCombo( lang ){
+	var gyoyang_campus_cd 		= $("#gyoyang_campus_cd").val();
+	var js_gyoyang_area_data 	= eval("DATA.gyoyang_area.rows");
+	var _html 					= "";
+	var _init_data 				= "00000";
+	var _init_msg 				= "선택하세요";
+	var _loading_msg 			= "Loading...";
+	var _no_data_msg 			= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg				= "Please Select";
+		_no_data_msg 			= "No Data Found...";
+	}
+	
+	$("#gyoyang_area").empty();
+	
+	if(js_gyoyang_area_data.length > 0 ){
+		_html += "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+		for(var i=0; i<js_gyoyang_area_data.length; i++){	
+			if( js_gyoyang_area_data[i].up == gyoyang_campus_cd ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_gyoyang_area_data[i].code+"\" \>"+js_gyoyang_area_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_gyoyang_area_data[i].code+"\" \>"+js_gyoyang_area_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#gyoyang_area").append( _html );
+	
+	document.form.gyoyang_area.options[0].selected	= true;
+	loadGyoyangGwamok( lang );
+	document.form.gyoyang_area.focus();
+}
+// 교양영역에 따른 과목가져오기 | 기존 : GetGwamokByArea()
+// 기존 : GetGwamokByArea() 변경
+function loadGyoyangGwamok( lang ){
+	var gyoyang_campus_cd 		= $("#gyoyang_campus_cd").val();
+	var gyoyang_area 			= $("#gyoyang_area").val();
+	var js_gyoyang_data 		= eval("DATA.gyoyang.rows");
+	var _html 					= "";
+	var _init_data 				= "00000";
+	var _init_msg 				= "선택하세요";
+	var _loading_msg 			= "Loading...";
+	var _no_data_msg 			= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg				= "Please Select";
+		_no_data_msg 			= "No Data Found...";
+	}
+	
+	$("#gyoyang_gwamok").empty();	
+	
+	if(js_gyoyang_data.length > 0 ){
+		_html += "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+		for(var i=0; i<js_gyoyang_data.length; i++){	
+			if( js_gyoyang_data[i].up == gyoyang_campus_cd && js_gyoyang_data[i].up1 == gyoyang_area ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_gyoyang_data[i].code+"\" \>"+js_gyoyang_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_gyoyang_data[i].code+"\" \>"+js_gyoyang_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#gyoyang_gwamok").append( _html );
+	
+	if(document.form.gyoyang_gwamok.length > 0){
+		document.form.gyoyang_gwamok.options[0].selected = true;
+		document.form.gyoyang_gwamok.focus();
+	}
+}
+//----------------------------------------------------------------------------
+//E : 교양
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//S : 전공
+// 	기존 changeMajor() 함수를 3개로 나눴음 
+//----------------------------------------------------------------------------
+// 대학 콤보 변경
+function loadMajorUnivCombo( lang ){
+	var flag 				= "A";
+	$("#flag").val(flag);
+	var js_major_data 	= eval("DATA.major.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#daehak_cd").empty();
+	$("#daehak_cd").append( _html );
+	
+	$("#hakgwa_cd").empty();
+	$("#major_cd").empty();
+	$("#hakgwa_cd").append( _html );
+	$("#major_cd").append( _html );
+	
+	_html = "";
+	
+	if(js_major_data.length > 0 ){
+		for(var i=0; i<js_major_data.length; i++){	
+			if( js_major_data[i].div == flag && js_major_data[i].up == $("#campus_cd").val() ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_major_data[i].code+"\" \>"+js_major_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_major_data[i].code+"\" \>"+js_major_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#daehak_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.daehak_cd.length == 1){
+		document.form.daehak_cd.length = 0;
+	}else{
+		document.form.daehak_cd.options[0].selected = true;
+		document.form.daehak_cd.focus();
+	}
+}
+//학과 콤보 변경
+function loadMajorHakgwaCombo( lang ){
+	var flag 				= "B";
+	$("#flag").val(flag);
+	var js_major_data 	= eval("DATA.major.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#hakgwa_cd").empty();
+	$("#hakgwa_cd").append( _html );
+	
+	$("#major_cd").empty();
+	$("#major_cd").append( _html );
+	
+	_html = "";
+	if(js_major_data.length > 0 ){
+		for(var i=0; i<js_major_data.length; i++){	
+			if( js_major_data[i].div == flag && js_major_data[i].up == $("#daehak_cd").val() ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_major_data[i].code+"\" \>"+js_major_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_major_data[i].code+"\" \>"+js_major_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#hakgwa_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.hakgwa_cd.length == 1){
+		document.form.hakgwa_cd.length = 0;
+	}else{
+		document.form.hakgwa_cd.options[0].selected = true;
+		document.form.hakgwa_cd.focus();
+	}
+}
+//전공 콤보 변경
+function loadMajorMajorCombo( lang ){
+	var flag 				= "C";
+	$("#flag").val(flag);
+	var js_major_data 	= eval("DATA.major.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#major_cd").empty();
+	$("#major_cd").append( _html );
+	
+	$("#major_cd").empty();
+	$("#major_cd").append( _html );
+	
+	_html = "";
+	if(js_major_data.length > 0 ){
+		for(var i=0; i<js_major_data.length; i++){	
+			if( js_major_data[i].div == flag && js_major_data[i].up == $("#hakgwa_cd").val() ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_major_data[i].code+"\" \>"+js_major_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_major_data[i].code+"\" \>"+js_major_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#major_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.major_cd.length == 1){
+		document.form.major_cd.length = 0;
+	}else{
+		document.form.major_cd.options[0].selected = true;
+		document.form.major_cd.focus();
+	}
+}
+//----------------------------------------------------------------------------
+//E : 전공
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//S : 교직  기존: GetTeach()
+//----------------------------------------------------------------------------
+function loadTeachCombo( lang ){
+	var teaching_gwamok_cd 	= $("#teaching_gwamok_cd").val();
+	var js_teach_data 	= eval("DATA.teach.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#teaching_gwamok_cd").empty();
+	$("#teaching_gwamok_cd").append( _html );
+	
+	_html = "";
+	if(js_teach_data.length > 0 ){
+		for(var i=0; i<js_teach_data.length; i++){
+			if( lang == "en" ){
+				_html += "<option value=\""+js_teach_data[i].code+"\" \>"+js_teach_data[i].ename+"</option>";
+			}else{
+				_html += "<option value=\""+js_teach_data[i].code+"\" \>"+js_teach_data[i].kname+"</option>";
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#teaching_gwamok_cd").append( _html );
+}
+//----------------------------------------------------------------------------
+//E : 교직  기존: GetTeach()
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//S : 연계(융합)과목  기존: GetConnect()
+//----------------------------------------------------------------------------
+function loadConnectCombo( lang ){
+	var connect_gwamok_cd 	= $("#connect_gwamok_cd").val();
+	var js_connect_data 	= eval("DATA.connect.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#connect_gwamok_cd").empty();
+	$("#connect_gwamok_cd").append( _html );
+	
+	_html = "";
+	if(js_connect_data.length > 0 ){
+		for(var i=0; i<js_connect_data.length; i++){
+			if( lang == "en" ){
+				_html += "<option value=\""+js_connect_data[i].code+"\" \>"+js_connect_data[i].ename+"</option>";
+			}else{
+				_html += "<option value=\""+js_connect_data[i].code+"\" \>"+js_connect_data[i].kname+"</option>";
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#connect_gwamok_cd").append( _html );
+}
+//----------------------------------------------------------------------------
+//E : 연계(융합)과목  기존: GetTeach()
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//S : 일반대학원 과목  
+// 	기존 change_grade() 함수를 3개로 나눴음
+//----------------------------------------------------------------------------
+// 대학 콤보 변경
+function loadGradeUnivCombo( lang ){
+	var flag 				= "A";
+	$("#flag").val(flag);
+	var js_grade_data 	= eval("DATA.grade.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#grade_daehak_cd").empty();
+	$("#grade_daehak_cd").append( _html );
+	
+	$("#grade_hakgwa_cd").empty();
+	$("#grade_gwajung_cd").empty();
+	$("#grade_hakgwa_cd").append( _html );
+	$("#grade_gwajung_cd").append( _html );
+	
+	_html = "";
+	
+	if(js_grade_data.length > 0 ){
+		for(var i=0; i<js_grade_data.length; i++){	
+			if( js_grade_data[i].div == flag && js_grade_data[i].up == "TOP" ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_grade_data[i].code+"\" \>"+js_grade_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_grade_data[i].code+"\" \>"+js_grade_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#grade_daehak_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.grade_daehak_cd.length == 1){
+		document.form.grade_daehak_cd.length = 0;
+		//대학원선택에서 자료가 없을 경우 과정에 대한 콤보 박스도 지우기
+		document.form.grade_gwajung_cd.length = 0;
+	}else{
+		document.form.grade_daehak_cd.options[0].selected = true;
+		document.form.grade_daehak_cd.focus();
+	}
+}
+//학과 콤보 변경
+function loadGradeHakgwaCombo( lang ){
+	var flag 				= "B";
+	$("#flag").val(flag);
+	var js_grade_data 	= eval("DATA.grade.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#grade_hakgwa_cd").empty();
+	$("#grade_hakgwa_cd").append( _html );
+	
+	$("#grade_gwajung_cd").empty();
+	$("#grade_gwajung_cd").append( _html );
+	
+	_html = "";
+	if(js_grade_data.length > 0 ){
+		for(var i=0; i<js_grade_data.length; i++){	
+			if( js_grade_data[i].div == flag && js_grade_data[i].up == $("#grade_daehak_cd").val() ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_grade_data[i].code+"\" \>"+js_grade_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_grade_data[i].code+"\" \>"+js_grade_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#grade_hakgwa_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.grade_hakgwa_cd.length == 1){
+		document.form.grade_hakgwa_cd.length = 0;
+		//대학원선택에서 자료가 없을 경우 과정에 대한 콤보 박스도 지우기
+		document.form.grade_gwajung_cd.length = 0;
+	}else{
+		document.form.grade_hakgwa_cd.options[0].selected = true;
+		document.form.grade_hakgwa_cd.focus();
+	}
+}
+//과정 콤보 변경
+function loadGradeMajorCombo( lang ){
+	var flag 				= "C";
+	$("#flag").val(flag);
+	var js_grade_data 	= eval("DATA.grade.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#grade_gwajung_cd").empty();
+	$("#grade_gwajung_cd").append( _html );
+	
+	_html = "";
+	if(js_grade_data.length > 0 ){
+		for(var i=0; i<js_grade_data.length; i++){	
+			if( js_grade_data[i].div == flag && js_grade_data[i].up == $("#grade_hakgwa_cd").val() ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_grade_data[i].code+"\" \>"+js_grade_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_grade_data[i].code+"\" \>"+js_grade_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#grade_gwajung_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.grade_gwajung_cd.length == 1){
+		document.form.grade_gwajung_cd.length = 0;
+	}else{
+		document.form.grade_gwajung_cd.options[0].selected = true;
+		document.form.grade_gwajung_cd.focus();
+	}
+}
+//----------------------------------------------------------------------------
+//E : 일반대학원 과목
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//S : 특수대학원 과목  
+// 	기존 change_special() 함수를 3개로 나눴음
+//----------------------------------------------------------------------------
+// 대학 콤보 변경
+function loadSpecialUnivCombo( lang ){
+	var flag 				= "A";
+	$("#flag").val(flag);
+	var js_special_data 	= eval("DATA.special.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#special_daehak_cd").empty();
+	$("#special_daehak_cd").append( _html );
+	
+	$("#special_hakgwa_cd").empty();
+	$("#special_major_cd").empty();
+	$("#special_hakgwa_cd").append( _html );
+	$("#special_major_cd").append( _html );
+	
+	_html = "";
+	
+	if(js_special_data.length > 0 ){
+		for(var i=0; i<js_special_data.length; i++){	
+			if( js_special_data[i].div == flag && js_special_data[i].up == "TOP" ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_special_data[i].code+"\" \>"+js_special_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_special_data[i].code+"\" \>"+js_special_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#special_daehak_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.special_daehak_cd.length == 1){
+		document.form.special_daehak_cd.length = 0;
+		//대학원선택에서 자료가 없을 경우 전공에 대한 콤보 박스도 지우기
+		document.form.special_major_cd.length = 0;
+	}else{
+		document.form.special_daehak_cd.options[0].selected = true;
+		document.form.special_daehak_cd.focus();
+	}
+}
+//학과 콤보 변경
+function loadSpecialHakgwaCombo( lang ){
+	var flag 				= "B";
+	$("#flag").val(flag);
+	var js_special_data 	= eval("DATA.special.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#special_hakgwa_cd").empty();
+	$("#special_hakgwa_cd").append( _html );
+	
+	$("#special_major_cd").empty();
+	$("#special_major_cd").append( _html );
+	
+	_html = "";
+	if(js_special_data.length > 0 ){
+		for(var i=0; i<js_special_data.length; i++){	
+			if( js_special_data[i].div == flag && js_special_data[i].up == $("#special_daehak_cd").val() ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_special_data[i].code+"\" \>"+js_special_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_special_data[i].code+"\" \>"+js_special_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#special_hakgwa_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.special_hakgwa_cd.length == 1){
+		document.form.special_hakgwa_cd.length = 0;
+		//대학원선택에서 자료가 없을 경우 전공에 대한 콤보 박스도 지우기
+		document.form.special_major_cd.length = 0;
+	}else{
+		document.form.special_hakgwa_cd.options[0].selected = true;
+		document.form.special_hakgwa_cd.focus();
+	}
+}
+//전공 콤보 변경
+function loadSpecialMajorCombo( lang ){
+	var flag 				= "C";
+	$("#flag").val(flag);
+	var js_special_data 	= eval("DATA.special.rows");
+	
+	var _init_data 			= "00000";
+	var _init_msg 			= "선택하세요";
+	var _loading_msg 		= "Loading...";
+	var _no_data_msg 		= "데이터가 존재하지 않습니다.";
+	if( lang == "en" ){
+		_init_msg			= "Please Select";
+		_no_data_msg 		= "No Data Found...";
+	}
+	var _html 				= "<option value=\""+_init_data+"\" selected \>"+_init_msg+"</option>";
+	
+	$("#special_major_cd").empty();
+	$("#special_major_cd").append( _html );
+	
+	_html = "";
+	if(js_special_data.length > 0 ){
+		for(var i=0; i<js_special_data.length; i++){	
+			if( js_special_data[i].div == flag && js_special_data[i].up == $("#special_hakgwa_cd").val() ){
+				if( lang == "en" ){
+					_html += "<option value=\""+js_special_data[i].code+"\" \>"+js_special_data[i].ename+"</option>";
+				}else{
+					_html += "<option value=\""+js_special_data[i].code+"\" \>"+js_special_data[i].kname+"</option>";
+				}
+			}
+		}
+	}else{
+		_html += "<option value=\""+_init_data+"\" selected \>"+_no_data_msg+"</option>";
+	}
+	$("#special_major_cd").append( _html );
+	
+	//자료가 없으면 "선택하세요"를 지우고 빈칸으로
+	if(document.form.special_major_cd.length == 1){
+		document.form.special_major_cd.length = 0;
+	}else{
+		document.form.special_major_cd.options[0].selected = true;
+		document.form.special_major_cd.focus();
+	}
+}
+//----------------------------------------------------------------------------
+//E : 특수대학원 과목
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//S : 외국인전용 과목  
+//----------------------------------------------------------------------------
+function loadForeignerCombo( lang ){
+	
+}
+//----------------------------------------------------------------------------
+//E : 외국인전용 과목
+//----------------------------------------------------------------------------

@@ -1,0 +1,114 @@
+body {
+    width: 40%;
+    margin: 0 auto;
+}
+
+
+@media screen and (max-width:1200px) {
+    body {
+        width: 80%;
+    }
+}
+
+img#main_icon {
+    margin: 10px;
+}
+
+table#sugang_list {
+    width: 100%;
+    margin-bottom:200px;
+}
+
+table#sugang_list thead tr {
+    background-color: #d5e488;
+}
+
+table#sugang_list th {
+    border-bottom: 1px solid #000;
+}
+
+table#sugang_list tbody tr:hover {
+    background-color: #ddd;
+}
+
+table#sugang_list tbody td {
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+}
+
+table#sugang_list tbody tr td:nth-child(1),
+table#sugang_list tbody tr td:nth-child(2),
+table#sugang_list tbody tr td:nth-child(3),
+table#sugang_list tbody tr td:nth-child(6)
+{
+    text-align: center;
+}
+
+
+/* clock */
+div#clock {
+    position: fixed;
+    border: 2px solid #000;
+    border-radius: 10px;
+    background-color: #ffffffcc;
+    padding: 5px 10px;
+    font-size: 14pt;
+    font-weight: bold;
+    width: 150px;
+    top: 10;
+    right: 10;
+}
+
+
+
+/* appender */
+
+div#appender {
+    position: fixed;
+    border: 2px solid #000;
+    border-radius: 10px;
+    background-color: #ffffffcc;
+    padding: 5px 10px;
+    width: 500px;
+    bottom: 10;
+    right: 10;
+}
+
+div#appender input,
+div#appender button
+{ height: 30px; }
+
+div#appender input[name="class_code"] {
+    width: 100px;
+}
+
+div#appender input[name="remark"] {
+    width: 330px;
+}
+
+div#appender button {
+    width: 60px;
+}
+
+/* tool */
+
+div#tool {
+    position: fixed;
+    border: 2px solid #000;
+    border-radius: 10px;
+    background-color: #ffffffcc;
+    padding: 5px 10px;
+    bottom: 10;
+    left: 10;
+}
+
+div#tool button {
+    margin: 10px 10px;
+    height: 35px;
+}
+
+@media screen and (max-width:1200px) {
+    body {
+        width: 80%;
+    }
+}

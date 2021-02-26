@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<!-- saved from url=(0098)http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&fake=Mon%20Feb%2015%2009:59:10%20KST%202021 -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>수강신청</title>
+
+
+<!-- í¸íì±ë³´ê¸°ë¡ ì¸í´ ëìì¸ ê¹¨ì§ ë°©ì§ -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<link href="./ui-deepBlue.css" rel="stylesheet" type="text/css">
+<script src="./jquery-1.12.4.min.js.다운로드" type="text/javascript"></script>
+<script src="./jquery-ui.min.js.다운로드" type="text/javascript"></script>
+<script src="./jquery.jqGrid.js.다운로드" type="text/javascript"></script>
+<script src="./project-ui.js.다운로드" type="text/javascript"></script>
+<style>
+.fc-green {
+    color: #53b324 !important;
+}
+.grid-header h3 {
+    margin-top: 5px;
+    background-color: #e1f4c3;
+    font-size: 13px;
+}
+
+body.portal .main-frame header .user-info {
+    display: inherit;
+    position: absolute;
+    top: 40px;
+    right: 100px; 
+}
+header .info-header .user-info {
+    display: none;
+    position: absolute;
+    top: 42px;
+    /* right: -10px; */
+    z-index: 9;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 3px;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+}
+body.portal .main-frame .contents > h1 {
+    font-size: 15px;
+}
+/* 상단 탭메뉴 작게 */
+.ui-tabs-nav .ui-tabs-anchor {
+    min-width: 100px;
+    padding: 10px 15px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+/* 버튼 사이징 조절 (작게)*/
+input[type="button"].sm, input[type="submit"].sm, input[type="reset"].sm, button.sm, .button.sm, .ui-button.sm, .file-label.sm {
+	min-width: 50px;
+    /*height: 26px;*/
+    padding: 0 3px 2px;
+    font-size: 11px;
+    /*line-height: 24px;*/
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    letter-spacing: 0; 
+}
+/* 그리드 타 브라우저 호환 및 스크롤 */
+.ui-jqgrid tr.jqgrow td {
+	word-wrap: break-word; /* IE 5.5+ and CSS3 */
+	white-space: pre-wrap; /* CSS3 */
+	white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	overflow: yes;
+	/*height: auto;*/
+	vertical-align: middle;
+	/*padding-top: 1px;
+	padding-bottom: 1px*/
+}
+/* 그리드 tr 강조*/
+.ui-jqgrid tr.jqgrow td {    
+    border-bottom: 1px solid #e6e6e6;
+}
+</style>
+<script type="text/javascript">
+var context 				= "";
+var lang   					= "ko";
+
+var urlLectListJson			= context + "/core?attribute=lectListJson&lang="+lang+"&fake="+Date.now();
+var urlBasketListJson		= context + "/basket?attribute=basketListJson&lang="+lang+"&fake="+Date.now();
+var urlSugangBasketListJson	= context + "/sugang?attribute=sugangBasketListJson&lang="+lang+"&fake="+Date.now();
+var urlSugangListJson		= context + "/sugang?attribute=sugangListJson&lang="+lang+"&fake="+Date.now();
+var urlSugangWaitListJson	= context + "/sugang?attribute=sugangWaitListJson&lang="+lang+"&fake="+Date.now();
+
+var urlRetakeList			= context + "/core?attribute=retake&lang="+lang+"&fake="+Date.now();
+var urlIsuCombo				= context + "/core?attribute=isuCombo&lang="+lang+"&fake="+Date.now();
+
+var urlSugangMacro			= context + "/sugang?attribute=macro&lang="+lang+"&fake="+Date.now();
+var urlSugangMacroImg		= context + "/sugang?attribute=macro_img&lang="+lang+"&fake="+Date.now();
+var urlSugangMacroJson		= context + "/sugang?attribute=macro_json&lang="+lang+"&fake="+Date.now();
+
+var urlBasketMode			= context + "/basket?attribute=basketMode&lang="+lang+"&fake="+Date.now();
+var urlSugangMode			= context + "/sugang?attribute=sugangMode&lang="+lang+"&fake="+Date.now();
+
+var urlTimeTableBasket		= context + "/basket?attribute=timeTablePopup&lang="+lang+"&fake="+Date.now();
+var urlTimeTableSugang		= context + "/sugang?attribute=timeTablePopup&lang="+lang+"&fake="+Date.now();
+
+var urlLogoutSugangEnd		= context + "/core?attribute=sugangEnd&lang="+lang+"&del_div=Y&fake="+Date.now();
+
+//동적 리사이징을 하기 위한 변수 -- 2019/04/30
+var selectedTab 		= 1;	 // 탭화면 사용여부
+//var openYn 			= "X";   
+var openInfo 			= "open";	// open : 열어놓기 | close : 접기 | X : 사용안함
+var menuId				= "menu_00_0000";
+// 남은시간
+var tcounter;
+var myTimer;
+
+$(document).ready(function(){
+	$(".menu").click(function(){
+		if($(".aside").offset().left == 0){
+			closeSlide();
+		}else{
+			openSlide();
+		}  
+	});
+	openSlide();
+	
+	//Navigation
+	var nav = function () {    	
+        $('.nav-main > li> a').click(function () {
+            var nav_li = $('.nav-main');
+            var checkElement = $(this).parent();
+            var ulDom = checkElement.find('.nav-sub')[0];
+            if (ulDom == undefined) {
+            	$('.nav-main li').removeClass('active')
+                checkElement.addClass('active');
+                $('.nav-main').find('li').find('ul.nav-sub:visible').slideUp();
+                return;
+            }
+            if (ulDom.style.display != 'block') {
+                nav_li.find('li').find('ul.nav-sub:visible').slideUp();
+                nav_li.find('li.minus').removeClass('minus active').addClass('plus');
+                checkElement.removeClass('plus');
+                checkElement.addClass('minus');
+                checkElement.addClass('active');
+                checkElement.find('.nav-sub').slideDown(200);
+            } else {
+                checkElement.removeClass('minus');
+                checkElement.removeClass('active');
+                checkElement.addClass('plus');
+                checkElement.find('.nav-sub').slideUp(200);
+            }
+        });
+        
+        setTimeout(function(){
+        	var winHeight = $(window).innerHeight();
+            var conHeight = $(".main-frame").height();
+            if(winHeight < conHeight) {
+            	$(".aside").height(conHeight+3);
+            }
+    	}, 100);
+    };
+    nav();
+    
+    $(".user-name").click(function(){
+    	if($(".user-info").is(":hidden")){
+    		$(".user-name i").addClass('active');
+	    	$(".user-info").show();
+    	}else{
+	    	$(".user-name i").removeClass('active');
+	    	$(".user-info").hide();
+    	}
+    });
+   
+   // 화면배율 설정
+   initScope();
+});
+//슬라이드 메뉴
+function openSlide() {
+	$(".aside").removeClass("collapse");
+	$(".main-frame").removeClass("collapse");
+	setTimeout(function(){
+		$(window).trigger("resize"); 
+	}, 400);
+	fnResizing();
+}
+function closeSlide() {
+	$(".aside").addClass("collapse");
+	$(".main-frame").addClass("collapse");
+	setTimeout(function(){
+		$(window).trigger("resize"); 
+	}, 400);
+	fnResizing();
+}
+function fn_menu(menuId)
+{	
+	$(".nav-main li").removeClass("active");
+	$(".nav-main li a").removeClass("active");
+ 	$("#"+menuId).parent().addClass("active");
+ 	$("#"+menuId).parent().parent().parent().removeClass('plus').addClass('minus').addClass("active");
+ 	//$("#"+menuId).parent().parent().delay(300).slideDown(300);
+ 	$("#"+menuId).parent().parent().show();
+}
+function fn_3rdMenu(menuId)
+{	
+	$(".nav-main li").removeClass("active");
+	$(".nav-main li a").removeClass("active");
+ 	$("#"+menuId).addClass("active");
+ 	$("#"+menuId).parent().parent().addClass("active");
+ 	$("#"+menuId).parent().parent().parent().parent().removeClass('plus').addClass('minus').addClass("active");
+ 	//$("#"+menuId).parent().parent().parent().delay(300).slideDown(300);
+ 	$("#"+menuId).parent().parent().parent().show();
+}
+
+function goUrl(url, obj){
+	url = url + "&fake="+Date.now();
+	
+	$(".user-name i").removeClass('active');
+	$(".user-info").hide();
+	var str = obj.id;
+	if(str.charAt(str.length -1) == 0){
+		fn_menu(str);
+	}else{
+		fn_3rdMenu(str);
+	}
+	
+	//$('.wrap-loader').fadeIn(); 화면자체 로딩바
+	
+	$("#contents").empty();
+	$("#contents").load(context + url, validCheck);
+	
+	extendTimer();
+}
+validCheck = function(response, status, xhr) { //error: function(req, status, error){
+	var rs;
+	var code 	= "200";
+	var msg 	= "OK";
+	try{
+		rs 		= $.parseJSON(response);
+		code 	= rs.code || rs.rows[0].code;
+		msg 	= rs.msg || rs.rows[0].msg;
+	}catch(err){}
+	
+	if(code == "999"){
+		$("#contents").empty();
+		logout(msg);
+	}else if(xhr.status == "0"){
+		msgAlert(status);
+	}else if(code == "500" || xhr.status != "200"){
+		if(xhr.status == "404"){
+			msgAlert("파일을 찾을 수 없습니다.");
+		}else if(xhr.status == "500"){
+			msgAlert("파일에 오류가 있습니다.");	
+		}else if(xhr.status == "503"){
+			logout("Service Temporarily Unavailable.\n시스템 장애가 발생했습니다.\nA system failure has occurred.");
+		}else{
+			msgAlert(msg);
+			$("#contents").hide();
+		}
+	}
+	
+	//$('.wrap-loader').fadeOut(); 화면자체 로딩바
+}
+function logout(msg){	
+	if(msg == undefined){
+		comConfirm("로그아웃 하시겠습니까?", goLogout, "ko");
+	}else{	
+		msgAlert(msg, goLogout, "ko");
+	}
+}
+function goLogout(){	
+	// urlLogoutSugangEnd는 사용하지 않는다고 함 - 20200217 -조철영차장님 요청
+	//if( $("#div").val() == "Y" ){
+	//	location.href = urlLogoutSugangEnd;
+	//}else{
+		location.href = context + "/core?attribute=logOut&lang="+lang+"&fake=" + Date.now();
+	//}
+}
+
+function tstart(){ //초기 설정함수
+	tcounter	= 600; //10분 설정
+	myTimer 	= setInterval(Timer,1000)
+}
+function Timer(){ //시간표및 조건검사
+	tcounter = tcounter - 1; //1초식 감소
+	temp	 = Math.floor(tcounter/60); // 분부분 두자리 계산 mm
+	if ( Math.floor(tcounter/60) < 10 ) { temp = '0'+temp; }		 
+	temp = temp + ":"; //mm:ss의 : 이부분추가
+	if ( (tcounter%60) < 10 ) { temp = temp + '0'; } //초부분 두자리 계산 ss
+	temp = temp + (tcounter%60);	
+	// 시간출력
+	$("#timerRemain").text(temp);	// 시간출력 
+	if(tcounter<0) timerStop(); 	// 3분후 완료
+}
+// 완료함수
+function timerStop(){
+	var msg = "장시간 사용이 없어서 자동로그아웃 됩니다!.";
+	clearInterval(myTimer);
+	$("#timerRemain").text("00:00");	// 시간출력
+	logout(msg);
+}
+// 시간 연장하기
+function extendTimer() {
+	// 타이머가 표시 되어 있으면
+	if($("#timerRemain")) {		
+		// 빈페이지 호출
+		top.hiddenFrame.location.href = context + "/blank.html?fake="+Date.now();
+		clearInterval(myTimer);
+		$("#timerRemain").text("10:00");	// 시간출력 
+		tstart();
+	}
+}
+function fnResizing(){
+	if( $("#gridLecture").length > 0 ){
+		setGridSize("gridLecture", 400);
+	}
+	if( $("#gridSugang").length > 0 ){
+		setGridSize("gridSugang", 400);
+	}
+	if( $("#gridBasket").length > 0 ){
+		setGridSize("gridBasket", 400);
+	}
+	if( $("#gridWaitSugang").length > 0 ){
+		setGridSize("gridWaitSugang", 400);
+	}
+	if( $("#gridTimetable").length > 0 ){
+		setGridSize("gridTimetable", 400);
+	}
+}
+//================ S: 키 막기 =============== //
+function noRefresh(){	
+	if (event.keyCode == 116) {			// KEY_F5	
+		alert("F5키를 사용 할 수 없습니다.");
+        event.keyCode = 2;
+        return false;        
+	/* 이걸 넣으면, 매크로 레이어에서 백스페이스를 사용할수가 없게 됨
+	} else if (event.keyCode == 8 ) {	// KEY_BACKSPACE
+		msgAlert("BACKSPACE키를 사용 할 수 없습니다.");
+        event.keyCode = 0;
+        return false;*/	
+	} else if (event.keyCode == 13 ) {	// Enter Key
+		//msgAlert("Enter Key를 사용 할 수 없습니다.");
+        //event.keyCode = 0;
+        //return false;	
+    } else if (event.keyCode == 13 ) {	// Enter Key
+    	//event.keyCode = 0;
+        //return false;
+    }else if (event.keyCode == 17) {	// Ctrl 방지 기능
+    	event.keyCode = 0;
+        return false;
+    } else if(event.ctrlKey && (event.keyCode == 78 || event.keyCode == 82)) {
+        return false;
+     // 엔터키, 스페이스 키 막기    
+    } else if (event.keyCode === 13 || event.keyCode === 32) {
+    	alert("매크로 방지를 위해 엔터키와 스페이스바 키는 사용하실 수 없습니다.");
+        event.preventDefault();
+        return false;
+    }
+}
+$(document).on("contextmenu",function(e){
+	//alert("매크로 방지를 위해 마우스 오른클릭은 사용하실 수 없습니다.");
+    return false;
+});
+document.onkeydown = noRefresh; 
+//================ E: 키 막기 =============== //
+//================ 최적의 해상도 찾기 =============== //
+var scale = 1;
+function initScope(){
+    var availWidth  = screen.availWidth;
+    var availHeight = screen.availHeight;    
+    if( availWidth <= 1366 || availWidth <= 1440 ){
+    	scale = 0.7;
+    	$("#scope_id").text("70%");
+    	msgAlert("해당 PC의 해상도는 "+availWidth+"px * "+availHeight+"px 입니다.\n최적의 해상도가 아니므로 화면 배율을 70%로 변경합니다.\n원치 않으시면 화면배율 +/-로 변경하시기 바랍니다.");    	
+    	zooms('Y');
+    }else if( availWidth <= 1600 || availWidth <= 1680  ) {    	
+    	scale = 0.8;
+    	$("#scope_id").text("80%");
+    	msgAlert("해당 PC의 해상도는 "+availWidth+"px * "+availHeight+"px 입니다.\n최적의 해상도가 아니므로 화면 배율을 80%로 변경합니다.\n원치 않으시면 화면배율 +/-로 변경하시기 바랍니다.");
+    	zooms('Y');
+    }else if( availWidth <= 1768 ) {
+    	scale = 0.9;
+    	$("#scope_id").text("90%");
+    	msgAlert("해당 PC의 해상도는 "+availWidth+"px * "+availHeight+"px 입니다.\n최적의 해상도가 아니므로 화면 배율을 90%로 변경합니다.\n원치 않으시면 화면배율 +/-로 변경하시기 바랍니다.");
+    	zooms('Y');    	
+    }else{
+    	scale = 1;
+    	$("#scope_id").text("100%");
+    	zooms('Y');    	
+    }
+}
+//화면크기축소
+function zoomOut(){
+	scale = scale - 0.1;
+	if(scale <= 0.7) scale = 0.7;            //화면크기 최대 축소율 70% 
+	zooms('N');
+}
+//화면크기확대
+function zoomIn(){
+	scale =  scale + 0.1;
+	if(scale >= 2) scale = 2;          //화면크기 최대 확대율 200%
+	zooms('N');
+}
+//원래 화면크기로 되돌아가기
+function zoomReset(){
+	scale	= 1;
+	zooms('N');
+}
+function zooms(init_yn){
+	document.body.style.zoom = scale;
+	document.body.style.MozTransform = 'scale('+scale+')'; // Mozilla(firefox)
+	document.body.style.MozTransformOrigin = '0 0'; // Mozilla(firefox)
+	
+	if( init_yn == "N" ){
+		if(Math.floor((scale*100)) == 70){
+			alert ("더 이상 축소할 수 없습니다.");      //화면 축소율이 70% 이하일 경우 경고창
+		}
+		if(Math.floor((scale*100)) == 200){
+			alert ("더 이상 확대할 수 없습니다.");      //화면 확대율이 200% 이상일 경우 경고창
+		}
+	}
+	$("#scope_id").text(Math.floor((scale*100)) +"%");
+	winResize(200);	
+	extendTimer();
+}
+function winResize(delay){
+	setGridSize("gridLecture", delay);
+	setGridSize("gridBasket", delay);		
+	setGridSize("gridSugang", delay);
+	setGridSize("gridWaitSugang", delay);
+	setGridSize("gridTimetable", delay);
+}
+window.onload = function(){	
+	fn_menu("menu_00_0000");
+	$("#contents").load(context+"/core?attribute=coreNotice_"+lang);
+		
+	$("input[name=lang]").click(function(){
+		var lang = $("input[name=lang]:checked").val();
+		if( lang == "en" ){
+			location.href= context + "/core?attribute=coreFrame_"+lang+"&fake="+Date.now();
+		}
+	});
+	//parent.coreData.dateCheck(); // 데이터 체크
+	extendTimer();
+}
+function display_tel(tel){
+	$("#dyn_tel").html(tel);
+}
+function hide_tel(){
+	$("#dyn_tel").html("**** - ****");
+}
+</script>
+</head>
+
+<body class="portal" style="zoom: 0.8;"><input type="hidden" name="div" id="div" value="N">
+
+
+	<div class="wrap-loader" style="display:none;"><span class="loading-helper"></span><div class="loader"></div><div class="loading-text">Loading</div></div>
+	<div class="aside">
+		<h1><span style="cursor:pointer;" onclick="closeSlide();fnResizing();"><i class="xi-angle-left-thin" title="메뉴 닫기"></i>수강신청시스템</span></h1>
+		<nav>
+			<ul class="nav-main">
+				<li class="minus active"><a href="javascript:void(0)" id="menu_01_0000">수강관리</a>
+					<ul class="nav-sub" style="display: block;">
+						<!-- 공지사항 -->
+						<li class=""><a href="javascript:void(0)" id="menu_00_0000" onclick="goUrl(&#39;/core?attribute=coreNotice_ko&amp;lang=ko&#39;, this)">공지사항</a></li>
+						<!-- 개설과목조회 -->
+						<li><a href="javascript:void(0)" id="menu_01_0100">조회</a>
+							<div class="nav-third">
+								<a href="javascript:void(0)" id="menu_01_0101" onclick="goUrl(&#39;/core?attribute=coreLectureList&amp;lang=ko&#39;, this)">개설교과목 조회</a>
+								
+										<a href="javascript:void(0)" id="menu_01_0102" onclick="goUrl(&#39;/core?attribute=coreBasketList&amp;lang=ko&#39;, this)">소망가방 내역조회</a>
+								
+								
+									<a href="javascript:void(0)" id="menu_01_0103" onclick="goUrl(&#39;/core?attribute=coreSugangList&amp;lang=ko&#39;, this)">수강신청 내역조회</a>
+																
+							</div>
+						</li>
+						
+								<li class="active"><a href="javascript:void(0)" id="menu_01_0300" onclick="goUrl(&#39;/sugang?attribute=sugangMain&amp;lang=ko&#39;, this)">수강신청</a></li>
+						
+					</ul>					
+				</li>
+				
+			</ul>	
+			
+			<br>
+			<!-- 한글/영문 -->
+			
+			
+			<!-- 화면 배율 영역 -->
+			<table width="80%" cellpadding="0" cellspacing="0" border="0" align="center">
+				<tbody><tr height="30" valign="bottom">
+					 <td align="center" colspan="4" style="color:white;">화면배율</td>
+				 </tr>
+				 <tr height="2" valign="middle"></tr>
+				<tr>
+					<td align="center">
+						<span id="scope_id" style="color:white;">80%</span>
+					</td>
+					<td align="center">
+						<button type="button" class="sm main" onclick="zoomIn();" style="cursor:pointer">&nbsp;+&nbsp;</button>
+					</td>
+					<td align="center">
+						<button type="button" class="sm main" onclick="zoomOut();" style="cursor:pointer">&nbsp;-&nbsp;</button>
+					</td>
+					<td align="center">
+						<button type="button" class="sm blue" onclick="zoomReset();" style="cursor:pointer">초기화</button>
+					</td>
+				</tr>
+				<tr height="2" valign="middle"></tr>
+			</tbody></table>	
+			
+			<div class="footer">
+			  수원캠퍼스 (16227) <br>경기도 수원시 영통구 광교산로 154-42<br>전화 031) 249-9114<br><br>서울캠퍼스 (03746) <br>서울특별시 서대문구 경기대로 9길 24 <br>전화 02) 390-5114 <br><br>
+			 COPYRIGHT © KYONGGI UNIVERSITY. <br>ALL RIGHT RESERVED.
+			</div>
+		</nav>
+	</div>
+	<div class="main-frame">
+		<header>
+			<div class="menu" title="좌측 메뉴바 숨기기" onclick="fnResizing();extendTimer();"></div>
+			<img src="./logo-header.gif" title="로고" onclick="void(0);goUrl(&#39;/core?attribute=coreNotice_ko&#39;, this);" style="cursor:pointer;">
+			<table border="0" style="width:100%">
+				<tbody><tr>
+					<td class="alignL" style="width:35%;">
+						<b>TimeOut : </b><b class="fc-red"><span id="timerRemain">09:41</span></b>
+						&nbsp;				
+						<span>
+							<button type="button" onclick="javascript:extendTimer();">연장하기</button>
+						</span>
+					</td>					
+					<td class="alignR">
+						<div class="info-header">
+							<!-- <button type="button" class="lg line" id="manual" onClick="javascript:downLoadMenual();"><i class="xi-arrow-bottom"></i>수강신청 매뉴얼</button>
+							<div class="manual" style="display: none;">
+								<a href="#"><i class="xi-desktop"></i>PC용 다운로드</a>	
+								<a href="#"><i class="xi-mobile"></i>모바일용 다운로드</a>				
+							</div> -->
+							<div class="user" style="z-index:3;">
+								<span class="user-name">					
+									<i class="la-user"></i>201714089
+								</span>
+								<span>&nbsp;&nbsp;&nbsp;</span>
+								<span><button type="button" class="main" onclick="logout();">로그아웃</button></span>
+								<div class="user-info" style="width: 400px; display: none;">
+									<span class="site-name">2021년 1학기 수강신청</span>
+									<ul style="width:100%;">					
+										<li>
+											<label>성명</label>
+											<span>이재승</span>
+										</li>
+										<li>
+											<label>학년</label>
+											<span>3학년</span>
+										</li>
+										
+								      		<li>
+												<label>이수학기</label>
+												<span>이수학기(4)</span>
+											</li>
+								      	
+								      	<li>
+											<label>소속</label>
+											<span>수원주간</span>
+										</li>
+										<li>
+											<label>대학</label>
+											<span>융합과학대학</span>
+										</li>
+										<li>
+											<label>학과</label>
+											<span>융합보안학과</span>
+										</li>					
+										<li style="height:80px;">
+											<label>주소</label>
+											(017-24 )<br>서울특별시 노원구 중계로 160 ,화인동 901호 (중계동, 화인상가아파트)
+										</li>										
+										<li>
+											<label>연락처</label>
+											<span onmouseover="javascript:display_tel(&#39;010-3329-4492&#39;);" onmouseout="javascript:hide_tel();">
+												<span id="dyn_tel" name="dyn_tel">**** - ****</span>
+											</span>
+										</li>
+										<li>
+											<label>제한학점</label>
+											<span>11 ~ 20 학점</span>
+										</li>
+										<!-- 성적우수자 -->
+								        
+										<!-- 전부수강여부 -->
+										
+										<!-- 2012 교육과정 대상자 -->
+										
+										<li>
+											본인의 주소나 연락처가 변경된 경우, 쿠티스 '개인정보변경'에서 변경하시기 바랍니다.
+										</li>
+									</ul>
+									<button type="button" class="red" onclick="logout()">로그아웃</button>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>				
+			</tbody></table>	
+			
+		</header>
+		<div class="to-top" style="display: none;"></div>
+		<div class="contents" id="contents">
+
+
+<!-- 개설과목 스크립트 추가 - 20200225 -->
+<script type="text/javascript" src="./data_202110.js(1).다운로드"></script>
+<!-- 교과과목 스크립트 -->
+<script src="./lecture_script.js.다운로드" type="text/javascript"></script>
+	<!-- <h1>조회 > <b>개설강좌 검색</b></h1> -->
+	<form name="form" id="form">
+	<input type="hidden" id="menu" name="menu" value="1">
+	<input type="hidden" id="flag" name="flag" value="">
+	<input type="hidden" id="div_cd" name="div_cd" value="C">
+	<input type="hidden" id="gwamok_cd" name="gwamok_cd" value="1548">
+	<div id="tab" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
+		<ul role="tablist" class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header">			
+			<li style="display:block" role="tab" tabindex="0" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active ui-state-active" aria-controls="tabs-1" aria-labelledby="ui-id-23" aria-selected="true" aria-expanded="true"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-1" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-23">소망가방</a></li> <!-- //학부생만 소망가방 보여준다 -->
+			<li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-2" aria-labelledby="ui-id-24" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-2" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-24">교양</a></li>
+			<li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-3" aria-labelledby="ui-id-25" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-3" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-25">전공</a></li>
+			<li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-4" aria-labelledby="ui-id-26" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-4" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-26">교직</a></li>
+			<li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-5" aria-labelledby="ui-id-27" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-5" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-27">연계(융합)</a></li>
+			<li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-6" aria-labelledby="ui-id-28" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-6" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-28">ROTC</a></li>
+			<li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-7" aria-labelledby="ui-id-29" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-7" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-29">일반대학원</a></li>
+			<li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-8" aria-labelledby="ui-id-30" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-8" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-30">기타대학원</a></li>
+			<li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-9" aria-labelledby="ui-id-31" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-9" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-31">외국어과목</a></li>			
+			<li style="display:none" role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tabs-10" aria-labelledby="ui-id-32" aria-selected="false" aria-expanded="false"><a href="http://sugang.kyonggi.ac.kr/core?attribute=coreMain_ko&amp;fake=Mon%20Feb%2015%2009:59:10%20KST%202021#tabs-10" role="presentation" tabindex="-1" class="ui-tabs-anchor" id="ui-id-32">외국인전용</a></li>
+		</ul>
+		<!----------------------------------------------------------
+	    		소망가방내역
+	    ----------------------------------------------------------->
+	    
+		    <div id="tabs-1" aria-labelledby="ui-id-23" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="false" style="display: block;">
+			    <div class="wrap-grid" id="gridBasket_id" style="display: block;">
+					<div class="grid-header">
+						<h3>소망가방 List .</h3>
+						<span class="grid-info">
+							<span id="meta_2"><label>본 과목</label><span><em>2</em>학점</span><label>예비과목</label><span><em>0</em>학점</span></span>
+						</span>
+					</div>
+					<div class="ui-jqgrid ui-widget ui-widget-content ui-corner-all" id="gbox_gridBasket" dir="ltr" style="width: 1420px;"><div class="ui-widget-overlay jqgrid-overlay" id="lui_gridBasket"></div><div class="loading ui-state-default ui-state-active" id="load_gridBasket" style="display: none;">Loading ...</div><div class="ui-jqgrid-view" role="grid" id="gview_gridBasket" style="width: 1420px;"><div class="ui-jqgrid-titlebar ui-jqgrid-caption ui-widget-header ui-corner-top ui-helper-clearfix" style="display: none;"><a role="link" class="ui-jqgrid-titlebar-close ui-corner-all HeaderButton" style="right: 0px;"><span class="ui-icon ui-icon-circle-triangle-n"></span></a><span class="ui-jqgrid-title"></span></div><div class="ui-state-default ui-jqgrid-hdiv ui-corner-top" style="width: 1420px;"><div class="ui-jqgrid-hbox"><table class="ui-jqgrid-htable ui-common-table" style="width:1930px" role="presentation" aria-labelledby="gbox_gridBasket"><thead><tr class="ui-jqgrid-labels" role="row"><th id="gridBasket_rn" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 40px;"><div id="jqgh_gridBasket_rn">No<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_mode" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 60px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_mode" class="ui-jqgrid-sortable">신청<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_transfer_gb" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_transfer_gb" class="ui-jqgrid-sortable">일괄처리<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_save_gb_nm" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_save_gb_nm" class="ui-jqgrid-sortable">구분<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_jojik_gb_name" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_jojik_gb_name" class="ui-jqgrid-sortable">조직구분<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_gwamok_sosok" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 250px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_gwamok_sosok" class="ui-jqgrid-sortable">개설전공<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_gwamok_no" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 80px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_gwamok_no" class="ui-jqgrid-sortable">과목번호<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_haksu_cd" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 80px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_haksu_cd" class="ui-jqgrid-sortable">학수코드<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_gwamok_kname" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 220px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_gwamok_kname" class="ui-jqgrid-sortable">과목명<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_haknyun" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 50px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_haknyun" class="ui-jqgrid-sortable">학년<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_hakjum" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 50px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_hakjum" class="ui-jqgrid-sortable">학점<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_prof_name" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 120px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_prof_name" class="ui-jqgrid-sortable">담당교수<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_sigan" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 180px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_sigan" class="ui-jqgrid-sortable">교시<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_chg" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_chg" class="ui-jqgrid-sortable">변경사항<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_retake_yn" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_retake_yn" class="ui-jqgrid-sortable">재수강<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_bigo" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_bigo" class="ui-jqgrid-sortable">비고<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_abeek" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_abeek" class="ui-jqgrid-sortable">공학인증<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_judamdang_gyosu_pre" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_judamdang_gyosu_pre" class="ui-jqgrid-sortable">judamdang_gyosu_pre<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_judamdang_gyosu" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_judamdang_gyosu" class="ui-jqgrid-sortable">judamdang_gyosu<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_sigan_pre" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_sigan_pre" class="ui-jqgrid-sortable">sigan_pre<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_sigan" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_sigan" class="ui-jqgrid-sortable">sigan<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_sigan_trim" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_sigan_trim" class="ui-jqgrid-sortable">sigan_trim<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_prof_name_pre" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_prof_name_pre" class="ui-jqgrid-sortable">prof_name_pre<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_gaesul_status" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_gaesul_status" class="ui-jqgrid-sortable">gaesul_status<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_save_gb" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_save_gb" class="ui-jqgrid-sortable">save_gb<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_gwamok_no" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_gwamok_no" class="ui-jqgrid-sortable">gwamok_no<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridBasket_params" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridBasket_params" class="ui-jqgrid-sortable">params<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th></tr></thead></table></div></div><div class="ui-jqgrid-bdiv" style="height: 500px; width: 1420px;"><div style="position:relative;"><div></div><table id="gridBasket" class="ui-jqgrid-btable" tabindex="0" cellspacing="0" cellpadding="0" border="0" role="presentation" aria-multiselectable="false" aria-labelledby="gbox_gridBasket" style="width: 1930px;"><tbody><tr class="jqgfirstrow" role="row" style="height:auto"><td role="gridcell" style="height:0px;width:40px;"></td><td role="gridcell" style="height:0px;width:60px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:250px;"></td><td role="gridcell" style="height:0px;width:80px;"></td><td role="gridcell" style="height:0px;width:80px;"></td><td role="gridcell" style="height:0px;width:220px;"></td><td role="gridcell" style="height:0px;width:50px;"></td><td role="gridcell" style="height:0px;width:50px;"></td><td role="gridcell" style="height:0px;width:120px;"></td><td role="gridcell" style="height:0px;width:180px;"></td><td role="gridcell" style="height:0px;width:150px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:150px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td></tr><tr role="row" id="1" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" class="ui-state-default jqgrid-rownum" style="text-align:center;width: 40px;" title="1" aria-describedby="gridBasket_rn">1</td><td role="gridcell" style="text-align:center;" title="신청" aria-describedby="gridBasket_mode"><button type="button" class="sm main">신청</button></td><td role="gridcell" style="text-align:center;" title=" " aria-describedby="gridBasket_transfer_gb"> </td><td role="gridcell" style="text-align:center;" title="본과목" aria-describedby="gridBasket_save_gb_nm">본과목</td><td role="gridcell" style="text-align:center;" title="수원주간" aria-describedby="gridBasket_jojik_gb_name">수원주간</td><td role="gridcell" style="text-align:left;" title=" " aria-describedby="gridBasket_gwamok_sosok"> </td><td role="gridcell" style="text-align:center;" title="0711" aria-describedby="gridBasket_gwamok_no">0711</td><td role="gridcell" style="text-align:center;" title="AS308" aria-describedby="gridBasket_haksu_cd">AS308</td><td role="gridcell" style="text-align:left;" title="직무역량특별강좌" aria-describedby="gridBasket_gwamok_kname">직무역량특별강좌</td><td role="gridcell" style="text-align:center;" title=" " aria-describedby="gridBasket_haknyun"> </td><td role="gridcell" style="text-align:center;" title="2" aria-describedby="gridBasket_hakjum">2</td><td role="gridcell" style="text-align:center;" title="김명진" aria-describedby="gridBasket_prof_name">김명진</td><td role="gridcell" style="text-align:left;" title="목 5 6" aria-describedby="gridBasket_sigan">목 5 6</td><td role="gridcell" style="text-align:center;" aria-describedby="gridBasket_chg" title=""></td><td role="gridcell" style="text-align:center;" title=" " aria-describedby="gridBasket_retake_yn"> </td><td role="gridcell" style="text-align:center;" title=" " aria-describedby="gridBasket_bigo"> </td><td role="gridcell" style="text-align:center;" title=" " aria-describedby="gridBasket_abeek"> </td><td role="gridcell" style="display:none;" title="20010727" aria-describedby="gridBasket_judamdang_gyosu_pre">20010727</td><td role="gridcell" style="display:none;" title="20010727" aria-describedby="gridBasket_judamdang_gyosu">20010727</td><td role="gridcell" style="display:none;" title="목 5 6" aria-describedby="gridBasket_sigan_pre">목 5 6</td><td role="gridcell" style="display:none;" title="목 5 6" aria-describedby="gridBasket_sigan">목 5 6</td><td role="gridcell" style="display:none;" title="목56" aria-describedby="gridBasket_sigan_trim">목56</td><td role="gridcell" style="display:none;" title="김명진" aria-describedby="gridBasket_prof_name_pre">김명진</td><td role="gridcell" style="display:none;" title="N" aria-describedby="gridBasket_gaesul_status">N</td><td role="gridcell" style="display:none;" title="1" aria-describedby="gridBasket_save_gb">1</td><td role="gridcell" style="display:none;" title="0711" aria-describedby="gridBasket_gwamok_no">0711</td><td role="gridcell" style="display:none;" title="01@0711@1253" aria-describedby="gridBasket_params">01@0711@1253</td></tr></tbody></table></div></div></div><div class="ui-jqgrid-resize-mark" id="rs_mgridBasket">&nbsp;</div></div>
+				</div>
+			</div>
+		
+		<!----------------------------------------------------------
+	    		 교양과목조회
+	    ----------------------------------------------------------->
+		<div id="tabs-2" aria-labelledby="ui-id-24" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="true" style="display: none;">			
+			<div class="pnl-search" style="width:1000px;">
+				<table border="0">
+					<colgroup>
+						<col width="60px;"> <!-- 캠퍼스 -->
+						<col width="120px;">
+						<col width="80px;"> <!-- 영역 -->
+						<col width="300px;">
+						<col width="60px;"> <!-- 과목 -->
+						<col width="150px;">
+						<col width="80px;">	<!-- 버튼 -->			
+					</colgroup>
+					<tbody><tr>
+						<td class="alignC"><b>캠퍼스</b> </td>
+						<td class="alignC">
+							<select name="gyoyang_campus_cd" id="gyoyang_campus_cd" onchange="loadGyoyangAreaCombo();this.blur();" style="width:100%">
+								<option value="00000" selected="">선택하세요</option>
+								<option value="A1000">▶수원주간</option>
+								<option value="A2000">▶수원야간</option>
+								<option value="A4000">▶서울주간</option>
+								<option value="A3000">▶서울야간</option>								
+							</select>
+						</td>
+						<td class="alignC"><b>영 역</b></td>
+						<td class="alignC">
+							<select name="gyoyang_area" id="gyoyang_area" onchange="loadGyoyangGwamok();this.blur();" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>
+						<td class="alignC"><b>과 목</b></td>
+						<td class="alignC">
+							<select name="gyoyang_gwamok" id="gyoyang_gwamok" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>						
+						<td class="alignR">
+							<button class="" type="button" onclick="javascript:gridLecture(&#39;Y&#39;);extendTimer();">조회</button>
+						</td>					
+					</tr>					
+				</tbody></table>
+			</div>
+		</div> <!-- E : 교양 -->
+		
+		<!----------------------------------------------------------
+    		 전공과목 조회 
+    	----------------------------------------------------------->
+    	<div id="tabs-3" aria-labelledby="ui-id-25" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="true" style="display: none;">
+			<div class="pnl-search" style="width:1000px;">
+				<table border="0">
+					<colgroup>
+						<col width="60px;"> <!-- 캠퍼스 -->
+						<col width="120px;">
+						<col width="60px;"> <!-- 대학 -->
+						<col width="150px;">
+						<col width="80px;"> <!-- 학과 -->
+						<col width="200px;">
+						<col width="60px;"> <!-- 전공 -->
+						<col width="150px;">
+						<col width="80px;">	<!-- 버튼 -->						
+					</colgroup>
+					<tbody><tr>
+						<td class="alignC"><b>캠퍼스</b> </td>
+						<td class="alignC">
+							<select name="campus_cd" id="campus_cd" onchange="loadMajorUnivCombo();this.blur();" style="width:100%">
+								<option value="00000" selected="">선택하세요</option>
+								<option value="A1200">▶수원주간</option>
+								<option value="A2200">▶수원야간</option>
+								<option value="A4200">▶서울주간</option>
+								<option value="A3200">▶서울야간</option>								
+							</select>
+						</td>
+						<td class="alignC"><b>대 학</b></td>
+						<td class="alignC">
+							<select name="daehak_cd" id="daehak_cd" onchange="loadMajorHakgwaCombo();this.blur();" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>
+						<td class="alignC"><b>학과</b></td>
+						<td class="alignC">
+							<select name="hakgwa_cd" id="hakgwa_cd" onchange="loadMajorMajorCombo();this.blur();" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>
+						<td class="alignC"><b>전공</b></td>
+						<td class="alignC">
+							<select name="major_cd" id="major_cd" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>						
+						<td class="alignR">
+							<button class="" type="button" onclick="javascript:gridLecture(&#39;Y&#39;);extendTimer();">조회</button>
+						</td>					
+					</tr>					
+				</tbody></table>
+			</div>
+		</div> <!-- E : 전공과목 조회 -->
+		
+		<!----------------------------------------------------------
+    		 교직과목 조회 
+    	----------------------------------------------------------->
+    	<div id="tabs-4" aria-labelledby="ui-id-26" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="true" style="display: none;">
+			<div class="pnl-search" style="width:400px;">
+				<table border="0">
+					<colgroup>
+						<col width="60px;"> <!-- 과목 -->
+						<col width="150px;">
+						<col width="80px;">						
+					</colgroup>
+					<tbody><tr>
+						<td class="alignC"><b>과 목</b> </td>
+						<td class="alignC">
+							<select name="teaching_gwamok_cd" id="teaching_gwamok_cd" style="width:100%">
+								<option value="00000">선택하세요</option>							
+							</select>
+						</td>
+						<td class="alignR">
+							<button class="" type="button" onclick="javascript:gridLecture(&#39;Y&#39;);extendTimer();">조회</button>
+						</td>					
+					</tr>					
+				</tbody></table>
+			</div>
+		</div> <!-- E : 교직과목 조회 -->
+		
+		<!----------------------------------------------------------
+	    	연계(융합)과목 조회
+	   	----------------------------------------------------------->
+	   	<div id="tabs-5" aria-labelledby="ui-id-27" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="true" style="display: none;">
+			<div class="pnl-search" style="width:400px;">
+				<table border="0">
+					<colgroup>
+						<col width="60px;"> <!-- 과목 -->
+						<col width="150px;">
+						<col width="80px;">						
+					</colgroup>
+					<tbody><tr>
+						<td class="alignC"><b>구분</b> </td>
+						<td class="alignC">
+							<select name="connect_gwamok_cd" id="connect_gwamok_cd" style="width:100%">
+								<option value="00000">선택하세요</option>							
+							</select>
+						</td>
+						<td class="alignR">
+							<button class="" type="button" onclick="javascript:gridLecture(&#39;Y&#39;);extendTimer();">조회</button>
+						</td>					
+					</tr>					
+				</tbody></table>
+			</div>
+		</div> <!-- E : 교직과목 조회 -->
+		
+		<!----------------------------------------------------------
+	    	 ROTC과목조회
+	    ----------------------------------------------------------->
+	    <div id="tabs-6" aria-labelledby="ui-id-28" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="true" style="display: none;">
+			<div class="pnl-search" style="width:500px;">
+				<table border="0">
+					<colgroup>
+						<col width="60px;"> <!-- 과목 -->
+						<col width="80px;">						
+					</colgroup>
+					<tbody><tr>
+						<td class="alignC"><b>조회버튼을 눌러 조회하세요</b> </td>
+						<td class="alignR">
+							<button class="" type="button" onclick="javascript:gridLecture(&#39;Y&#39;);extendTimer();">조회</button>
+						</td>					
+					</tr>					
+				</tbody></table>
+			</div>
+		</div> <!-- E : 교직과목 조회 -->
+		
+		<!----------------------------------------------------------
+   		 	일반대학원 조회 
+   	  	----------------------------------------------------------->
+		<div id="tabs-7" aria-labelledby="ui-id-29" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="true" style="display: none;">			
+			<div class="pnl-search" style="width:900px;">
+				<table border="0">
+					<colgroup>
+						<col width="60px;"> <!-- 대학원 -->
+						<col width="120px;">
+						<col width="80px;"> <!-- 학과 -->
+						<col width="150px;">
+						<col width="60px;"> <!-- 과정 -->
+						<col width="150px;">
+						<col width="80px;">						
+					</colgroup>
+					<tbody><tr>
+						<td class="alignC"><b>대학원</b> </td>
+						<td class="alignC">
+							<select name="grade_daehak_cd" id="grade_daehak_cd" onchange="loadGradeHakgwaCombo();this.blur();" style="width:100%">
+								<option value="00000">선택하세요</option>								
+							</select>
+						</td>
+						<td class="alignC"><b>학과</b></td>
+						<td class="alignC">
+							<select name="grade_hakgwa_cd" id="grade_hakgwa_cd" onchange="loadGradeMajorCombo();this.blur();" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>
+						<td class="alignC"><b>과정</b></td>
+						<td class="alignC">
+							<select name="grade_gwajung_cd" id="grade_gwajung_cd" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>						
+						<td class="alignR">
+							<button class="" type="button" onclick="javascript:gridLecture(&#39;Y&#39;);extendTimer();">조회</button>
+						</td>					
+					</tr>					
+				</tbody></table>
+			</div>
+		</div> <!-- E : 일반대학원 -->
+		
+		<!----------------------------------------------------------
+   		 	특수대학원 조회
+   	  	----------------------------------------------------------->
+   	  	<div id="tabs-8" aria-labelledby="ui-id-30" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="true" style="display: none;">			
+			<div class="pnl-search" style="width:950px;">
+				<table border="0">
+					<colgroup>
+						<col width="60px;"> <!-- 대학원 -->
+						<col width="150px;">
+						<col width="80px;"> <!-- 학과 -->
+						<col width="150px;">
+						<col width="60px;"> <!-- 전공 -->
+						<col width="150px;">
+						<col width="80px;">						
+					</colgroup>
+					<tbody><tr>
+						<td class="alignC"><b>대학원</b> </td>
+						<td class="alignC">
+							<select name="special_daehak_cd" id="special_daehak_cd" onchange="loadSpecialHakgwaCombo();this.blur();" style="width:100%">
+								<option value="00000">선택하세요</option>								
+							</select>
+						</td>
+						<td class="alignC"><b>학과</b></td>
+						<td class="alignC">
+							<select name="special_hakgwa_cd" id="special_hakgwa_cd" onchange="loadSpecialMajorCombo();this.blur();" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>
+						<td class="alignC"><b>전공</b></td>
+						<td class="alignC">
+							<select name="special_major_cd" id="special_major_cd" style="width:100%">
+								<option value="00000">선택하세요</option>
+							</select>
+						</td>						
+						<td class="alignR">
+							<button class="" type="button" onclick="javascript:gridLecture(&#39;Y&#39;);extendTimer();">조회</button>
+						</td>					
+					</tr>					
+				</tbody></table>
+			</div>
+		</div> <!-- E : 특수대학원 -->
+		
+		<!----------------------------------------------------------
+    		 외국어 강좌 전용 조회
+    	----------------------------------------------------------->
+		<div id="tabs-9" aria-labelledby="ui-id-31" role="tabpanel" class="ui-tabs-panel ui-corner-bottom ui-widget-content" aria-hidden="true" style="display: none;">
+			<div class="pnl-search" style="width:500px;">
+				<table border="0">
+					<colgroup>
+						<col width="200px;"> <!-- 과목 -->
+						<col width="80px;">						
+					</colgroup>
+					<tbody><tr>
+						<td class="alignC"><b>조회버튼을 눌러 조회하세요</b> </td>
+						<td class="alignR">
+							<button class="" type="button" onclick="javascript:gridLecture(&#39;Y&#39;);extendTimer();">조회</button>
+						</td>					
+					</tr>					
+				</tbody></table>
+			</div>
+		</div>	<!-- E : 외국어 강좌 전용 -->
+		
+		<!----------------------------------------------------------
+    		 외국인전용 조회
+    	----------------------------------------------------------->
+    	
+		
+		<br>		
+		<div class="wrap-grid" id="gridLecture_id" style="display: none;">
+			<div class="grid-header">
+				<h3>개설강좌 List</h3>
+				<span class="grid-info">
+					<span id="meta_1"><label>총 조회건수</label><span><em>0</em>건</span></span>					
+				</span>
+			</div>
+			<div class="ui-jqgrid ui-widget ui-widget-content ui-corner-all" id="gbox_gridLecture" dir="ltr" style="width: 1439px;"><div class="ui-widget-overlay jqgrid-overlay" id="lui_gridLecture"></div><div class="loading ui-state-default ui-state-active" id="load_gridLecture" style="display: none;">Loading ...</div><div class="ui-jqgrid-view" role="grid" id="gview_gridLecture" style="width: 1439px;"><div class="ui-jqgrid-titlebar ui-jqgrid-caption ui-widget-header ui-corner-top ui-helper-clearfix" style="display: none;"><a role="link" class="ui-jqgrid-titlebar-close ui-corner-all HeaderButton" style="right: 0px;"><span class="ui-icon ui-icon-circle-triangle-n"></span></a><span class="ui-jqgrid-title"></span></div><div class="ui-state-default ui-jqgrid-hdiv ui-corner-top" style="width: 1439px;"><div class="ui-jqgrid-hbox"><table class="ui-jqgrid-htable ui-common-table" style="width:1340px" role="presentation" aria-labelledby="gbox_gridLecture"><thead><tr class="ui-jqgrid-labels" role="row"><th id="gridLecture_rn" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 40px;"><div id="jqgh_gridLecture_rn">No<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_mode" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 80px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_mode" class="ui-jqgrid-sortable">신청<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_gwamok_no" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 80px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_gwamok_no" class="ui-jqgrid-sortable">과목번호<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_haksu_cd" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 80px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_haksu_cd" class="ui-jqgrid-sortable">학수코드<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_gwamok_kname" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 250px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_gwamok_kname" class="ui-jqgrid-sortable">과목명<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_haknyun" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 70px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_haknyun" class="ui-jqgrid-sortable">학년<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_isu_name" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 70px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_isu_name" class="ui-jqgrid-sortable">이수구분<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_hakjum" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 70px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_hakjum" class="ui-jqgrid-sortable">학점<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_prof_name" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_prof_name" class="ui-jqgrid-sortable">담당교수<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_sigan" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_sigan" class="ui-jqgrid-sortable">교시<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_bigo" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_bigo" class="ui-jqgrid-sortable">비고<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_" class="ui-jqgrid-sortable">공학인증<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridLecture_params" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridLecture_params" class="ui-jqgrid-sortable">params<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th></tr></thead></table></div></div><div class="ui-jqgrid-bdiv" style="height: 500px; width: 1439px;"><div style="position:relative;"><div class="nodata active"><span class="fc-green">조회조건을 선택 후 조회버튼을 클릭하여 조회해주세요</span></div><table id="gridLecture" class="ui-jqgrid-btable" tabindex="0" cellspacing="0" cellpadding="0" border="0" role="presentation" aria-multiselectable="false" aria-labelledby="gbox_gridLecture" style="width: 1340px;"><tbody><tr class="jqgfirstrow" role="row" style="height:auto"><td role="gridcell" style="height:0px;width:40px;"></td><td role="gridcell" style="height:0px;width:80px;"></td><td role="gridcell" style="height:0px;width:80px;"></td><td role="gridcell" style="height:0px;width:80px;"></td><td role="gridcell" style="height:0px;width:250px;"></td><td role="gridcell" style="height:0px;width:70px;"></td><td role="gridcell" style="height:0px;width:70px;"></td><td role="gridcell" style="height:0px;width:70px;"></td><td role="gridcell" style="height:0px;width:150px;"></td><td role="gridcell" style="height:0px;width:150px;"></td><td role="gridcell" style="height:0px;width:150px;"></td><td role="gridcell" style="height:0px;width:150px;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td></tr></tbody></table></div></div></div><div class="ui-jqgrid-resize-mark" id="rs_mgridLecture">&nbsp;</div></div>
+		</div>
+	</div><!-- end tab -->
+	
+	<br>
+	
+	<div class="flex">		
+		<div class="col wrap-grid" id="gridSugang_id">
+			<div class="grid-header">
+				<h3>수강신청 List</h3>
+				<span class="grid-info">
+					<span id="meta_3"><label>현재 신청학점</label><span><em>14</em>학점</span></span>
+				</span>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<span class="fc-red">
+					<!-- ★빠른 수강신청&nbsp;&nbsp; -->
+					 선택&nbsp;:&nbsp;
+					<select name="univ_cd" id="univ_cd" onchange="changeUniv();this.blur();" style="width:100px;"><option value="00000" selected="">선택하세요</option><option value="01">학부</option><option value="10">대학원(서울)</option><option value="10">야간-대학원(서울)</option><option value="1T">야간-대학원(수원)</option><option value="1T">대학원(수원)</option><option value="20">건축전문대학원</option><option value="25">건축대학원</option><option value="25">야간-건축대학원</option><option value="31">행정대학원</option><option value="32">서비스경영전문대학원</option><option value="32">야간-서비스경영전문대학원</option><option value="34">조형대학원</option><option value="35">정치전문대학원</option><option value="35">야간-정치전문대학원</option><option value="37">관광전문대학원</option><option value="37">야간-관광전문대학원</option><option value="40">주간-행정ㆍ사회복지대학원</option><option value="40">행정ㆍ사회복지대학원</option><option value="50">교육대학원</option><option value="51">스포츠과학대학원</option><option value="52">주간-대체의학대학원</option><option value="52">대체의학대학원</option><option value="53">사회복지대학원</option><option value="54">미술ㆍ디자인대학원(수원)</option><option value="55">미술ㆍ디자인대학원(서울)</option><option value="56">건설ㆍ산업대학원</option><option value="57">문화예술대학원</option><option value="58">주간-예술대학원</option><option value="58">예술대학원</option><option value="59">공학대학원</option><option value="59">주간-공학대학원</option><option value="5A">주간-한류문화대학원</option><option value="5A">한류문화대학원</option><option value="68">예술대학원(수원)</option></select>					
+					&nbsp;&nbsp;과목번호&nbsp;:&nbsp;
+					<input type="text" name="gwamok_cd2" id="gwamok_cd2" style="font-size: 12px;font-family: &#39;돋움&#39;, &#39;돋움체&#39;;color: #666666;width:40px;height:20px;ime-mode:disabled" onkeypress="javascript:changeGwamokCd();">&nbsp;&nbsp;
+					<span id="span_isu_cd" name="span_isu_cd" style="display: none;">
+						이수구분&nbsp;:&nbsp;
+						<select name="isu_cd" id="isu_cd" onchange="changeUniv();this.blur();" style="width:100px;"><option value="00000" selected="">선택하세요</option><option value="7586">[전선]전공선택(컴퓨터공학부)</option><option value="5327">[융데]융합데이터공학전공(융합)</option></select>
+					</span>
+					<button type="button" class="sm main" style="vertical-align:bottom;" onclick="fastSave();">신청</button>
+				</span>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<span class="grid-info-sub">
+					<span onclick="menuControl(&#39;gridSugang&#39;, &#39;sgMenu&#39;, &#39;접기&#39;, &#39;sgTitle&#39;)" style="cursor:pointer;">
+						<img id="sgMenu" src="./close.png" style="margin-bottom: -4px;width:20px;height:20px;cursor:pointer;" title="접기">&nbsp;
+							<span id="sgTitle" class="fc-blue">접기</span>
+					</span>&nbsp;&nbsp;&nbsp;&nbsp;
+					<!-- <span onClick="menuReload('gridSugang');" style="cursor:pointer;">
+						<img id="sgReload"  src="/resources/img/reload32.png" style="margin-bottom: -4px;width:20px;height:20px;cursor:pointer;" title="새로고침"></img>&nbsp;
+						<span id="sgTitle1" class="fc-blue">새로고침</span>
+					</span>&nbsp;&nbsp; -->
+				</span>
+			</div>
+			<div class="ui-jqgrid ui-widget ui-widget-content ui-corner-all" id="gbox_gridSugang" dir="ltr" style="width: 1420px;"><div class="ui-widget-overlay jqgrid-overlay" id="lui_gridSugang"></div><div class="loading ui-state-default ui-state-active" id="load_gridSugang" style="display: none;">Loading ...</div><div class="ui-jqgrid-view" role="grid" id="gview_gridSugang" style="width: 1420px; display: block;"><div class="ui-jqgrid-titlebar ui-jqgrid-caption ui-widget-header ui-corner-top ui-helper-clearfix" style="display: none;"><a role="link" class="ui-jqgrid-titlebar-close ui-corner-all HeaderButton" style="right: 0px;"><span class="ui-icon ui-icon-circle-triangle-n"></span></a><span class="ui-jqgrid-title"></span></div><div class="ui-state-default ui-jqgrid-hdiv ui-corner-top" style="width: 1420px;"><div class="ui-jqgrid-hbox"><table class="ui-jqgrid-htable ui-common-table" style="width:1330px" role="presentation" aria-labelledby="gbox_gridSugang"><thead><tr class="ui-jqgrid-labels" role="row"><th id="gridSugang_rn" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 40px;"><div id="jqgh_gridSugang_rn">No<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_mode" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 80px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_mode" class="ui-jqgrid-sortable">삭제<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_campus_nm" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 110px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_campus_nm" class="ui-jqgrid-sortable">캠퍼스<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_gwamok_no" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_gwamok_no" class="ui-jqgrid-sortable">과목번호<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_gwamok_kname" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 200px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_gwamok_kname" class="ui-jqgrid-sortable">과목명<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_sigan" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 120px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_sigan" class="ui-jqgrid-sortable">교시<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_isu_gb_name" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 80px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_isu_gb_name" class="ui-jqgrid-sortable">이수구분<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_hakjum" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 50px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_hakjum" class="ui-jqgrid-sortable">학점<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_prof_name" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_prof_name" class="ui-jqgrid-sortable">담당교수<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_retake_yn" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_retake_yn" class="ui-jqgrid-sortable">재수강<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_bigo" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_bigo" class="ui-jqgrid-sortable">비고<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_abeek" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_abeek" class="ui-jqgrid-sortable">공학인증<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_yh_gb" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 100px;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_yh_gb" class="ui-jqgrid-sortable">대기순위<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="gridSugang_params" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 150px; display: none;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_gridSugang_params" class="ui-jqgrid-sortable">params<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th></tr></thead></table></div></div><div class="ui-jqgrid-bdiv" style="height: 400px; width: 1420px;"><div style="position:relative;"><div class=""></div><table id="gridSugang" tabindex="0" cellspacing="0" cellpadding="0" border="0" role="presentation" aria-multiselectable="false" aria-labelledby="gbox_gridSugang" class="ui-jqgrid-btable" style="width: 1330px;"><tbody><tr class="jqgfirstrow" role="row" style="height:auto"><td role="gridcell" style="height:0px;width:40px;"></td><td role="gridcell" style="height:0px;width:80px;"></td><td role="gridcell" style="height:0px;width:110px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:200px;"></td><td role="gridcell" style="height:0px;width:120px;"></td><td role="gridcell" style="height:0px;width:80px;"></td><td role="gridcell" style="height:0px;width:50px;"></td><td role="gridcell" style="height:0px;width:150px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:100px;"></td><td role="gridcell" style="height:0px;width:150px;display:none;"></td></tr><tr role="row" id="1" tabindex="0" class="ui-widget-content jqgrow ui-row-ltr ui-state-highlight" aria-selected="true"><td role="gridcell" class="ui-state-default jqgrid-rownum" style="text-align:center;width: 40px;" title="1" aria-describedby="gridSugang_rn">1</td><td role="gridcell" style="text-align:center;" title="삭제" aria-describedby="gridSugang_mode"><button type="button" class="sm red">삭제</button></td><td role="gridcell" style="text-align:center;" title="수원주간" aria-describedby="gridSugang_campus_nm">수원주간</td><td role="gridcell" style="text-align:center;" title="0711" aria-describedby="gridSugang_gwamok_no">0711</td><td role="gridcell" style="text-align:left;" title="직무역량특별강좌" aria-describedby="gridSugang_gwamok_kname">직무역량특별강좌</td><td role="gridcell" style="text-align:center;" title="목 5 6" aria-describedby="gridSugang_sigan">목 5 6</td><td role="gridcell" style="text-align:center;" title="취창" aria-describedby="gridSugang_isu_gb_name">취창</td><td role="gridcell" style="text-align:center;" title="2" aria-describedby="gridSugang_hakjum">2</td><td role="gridcell" style="text-align:center;" title="김명진" aria-describedby="gridSugang_prof_name">김명진</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_retake_yn">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_bigo">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_abeek">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_yh_gb">&nbsp;</td><td role="gridcell" style="display:none;" title="A1000@0711" aria-describedby="gridSugang_params">A1000@0711</td></tr><tr role="row" id="2" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr ui-priority-secondary" aria-selected="false"><td role="gridcell" class="ui-state-default jqgrid-rownum" style="text-align:center;" title="2" aria-describedby="gridSugang_rn">2</td><td role="gridcell" style="text-align:center;" title="삭제" aria-describedby="gridSugang_mode"><button type="button" class="sm red">삭제</button></td><td role="gridcell" style="text-align:center;" title="수원주간" aria-describedby="gridSugang_campus_nm">수원주간</td><td role="gridcell" style="text-align:center;" title="1544" aria-describedby="gridSugang_gwamok_no">1544</td><td role="gridcell" style="text-align:left;" title="운영체제" aria-describedby="gridSugang_gwamok_kname">운영체제</td><td role="gridcell" style="text-align:center;" title="월 1 2 3" aria-describedby="gridSugang_sigan">월 1 2 3</td><td role="gridcell" style="text-align:center;" title="전선" aria-describedby="gridSugang_isu_gb_name">전선</td><td role="gridcell" style="text-align:center;" title="3" aria-describedby="gridSugang_hakjum">3</td><td role="gridcell" style="text-align:center;" title="이병대" aria-describedby="gridSugang_prof_name">이병대</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_retake_yn">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_bigo">&nbsp;</td><td role="gridcell" style="text-align:center;" title="Y" aria-describedby="gridSugang_abeek">Y</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_yh_gb">&nbsp;</td><td role="gridcell" style="display:none;" title="A1000@1544" aria-describedby="gridSugang_params">A1000@1544</td></tr><tr role="row" id="3" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr" aria-selected="false"><td role="gridcell" class="ui-state-default jqgrid-rownum" style="text-align:center;" title="3" aria-describedby="gridSugang_rn">3</td><td role="gridcell" style="text-align:center;" title="삭제" aria-describedby="gridSugang_mode"><button type="button" class="sm red">삭제</button></td><td role="gridcell" style="text-align:center;" title="수원주간" aria-describedby="gridSugang_campus_nm">수원주간</td><td role="gridcell" style="text-align:center;" title="2492" aria-describedby="gridSugang_gwamok_no">2492</td><td role="gridcell" style="text-align:left;" title="시스템보안및관리" aria-describedby="gridSugang_gwamok_kname">시스템보안및관리</td><td role="gridcell" style="text-align:center;" title="목 1 2 3" aria-describedby="gridSugang_sigan">목 1 2 3</td><td role="gridcell" style="text-align:center;" title="전선" aria-describedby="gridSugang_isu_gb_name">전선</td><td role="gridcell" style="text-align:center;" title="3" aria-describedby="gridSugang_hakjum">3</td><td role="gridcell" style="text-align:center;" title="신상일" aria-describedby="gridSugang_prof_name">신상일</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_retake_yn">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_bigo">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_abeek">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_yh_gb">&nbsp;</td><td role="gridcell" style="display:none;" title="A1000@2492" aria-describedby="gridSugang_params">A1000@2492</td></tr><tr role="row" id="4" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr ui-priority-secondary" aria-selected="false"><td role="gridcell" class="ui-state-default jqgrid-rownum" style="text-align:center;" title="4" aria-describedby="gridSugang_rn">4</td><td role="gridcell" style="text-align:center;" title="삭제" aria-describedby="gridSugang_mode"><button type="button" class="sm red">삭제</button></td><td role="gridcell" style="text-align:center;" title="수원주간" aria-describedby="gridSugang_campus_nm">수원주간</td><td role="gridcell" style="text-align:center;" title="1539" aria-describedby="gridSugang_gwamok_no">1539</td><td role="gridcell" style="text-align:left;" title="인공지능" aria-describedby="gridSugang_gwamok_kname">인공지능</td><td role="gridcell" style="text-align:center;" title="화 1 2 3" aria-describedby="gridSugang_sigan">화 1 2 3</td><td role="gridcell" style="text-align:center;" title="전선" aria-describedby="gridSugang_isu_gb_name">전선</td><td role="gridcell" style="text-align:center;" title="3" aria-describedby="gridSugang_hakjum">3</td><td role="gridcell" style="text-align:center;" title="김인철" aria-describedby="gridSugang_prof_name">김인철</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_retake_yn">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_bigo">&nbsp;</td><td role="gridcell" style="text-align:center;" title="Y" aria-describedby="gridSugang_abeek">Y</td><td role="gridcell" style="text-align:center;" title="수강신청대기(4순위)" aria-describedby="gridSugang_yh_gb"><b><font color="red">수강신청대기</font></b><b><span style="color:red">(4순위)</span><b></b></b></td><td role="gridcell" style="display:none;" title="A1000@1539" aria-describedby="gridSugang_params">A1000@1539</td></tr><tr role="row" id="5" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr" aria-selected="false"><td role="gridcell" class="ui-state-default jqgrid-rownum" style="text-align:center;" title="5" aria-describedby="gridSugang_rn">5</td><td role="gridcell" style="text-align:center;" title="삭제" aria-describedby="gridSugang_mode"><button type="button" class="sm red">삭제</button></td><td role="gridcell" style="text-align:center;" title="수원주간" aria-describedby="gridSugang_campus_nm">수원주간</td><td role="gridcell" style="text-align:center;" title="1551" aria-describedby="gridSugang_gwamok_no">1551</td><td role="gridcell" style="text-align:left;" title="정보보호개론" aria-describedby="gridSugang_gwamok_kname">정보보호개론</td><td role="gridcell" style="text-align:center;" title="수 6 7 8" aria-describedby="gridSugang_sigan">수 6 7 8</td><td role="gridcell" style="text-align:center;" title="전선" aria-describedby="gridSugang_isu_gb_name">전선</td><td role="gridcell" style="text-align:center;" title="3" aria-describedby="gridSugang_hakjum">3</td><td role="gridcell" style="text-align:center;" title="김희열" aria-describedby="gridSugang_prof_name">김희열</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_retake_yn">&nbsp;</td><td role="gridcell" style="text-align:center;" title="" aria-describedby="gridSugang_bigo">&nbsp;</td><td role="gridcell" style="text-align:center;" title="Y" aria-describedby="gridSugang_abeek">Y</td><td role="gridcell" style="text-align:center;" title="수강신청대기(7순위)" aria-describedby="gridSugang_yh_gb"><b><font color="red">수강신청대기</font></b><b><span style="color:red">(7순위)</span><b></b></b></td><td role="gridcell" style="display:none;" title="A1000@1551" aria-describedby="gridSugang_params">A1000@1551</td></tr></tbody></table></div></div></div><div class="ui-jqgrid-resize-mark" id="rs_mgridSugang">&nbsp;</div></div>			
+		</div>							
+	</div>
+	<div class="msg-warning">
+		<b>※ 대기순위란에 '수강신청대기'로 표기된 부분은 수강신청 기간에 수강처리되지 않을 경우(다른 학생이 수강취소하지 않을경우) 일괄 삭제처리됩니다.</b>
+		<br>
+		※ 수강신청대기 : 수강인원이 초과된 경우, 수강신청대기로 처리되며, 누군가 해당과목을 취소할때, 신청일자 우선순으로 수강유효처리가 됩니다.
+		<br>
+		&nbsp;&nbsp;&nbsp;단, 최초 수강신청 기간에만 적용이 되며, 수강신청 기간이 끝나면 수강대기자료는 일괄 삭제됩니다. 부족한 학점은 정정기간에 하실 수 있습니다.		
+	</div> 
+</form>
+	
+<script type="text/javascript">
+selectedTab 	= 0;	 // 탭화면 사용여부 0:장바구니 | 1:개설과목조회 | X:사용안함
+openInfo 		= "open";   // open : 열어놓기 | close : 접기 | X : 사용안함
+menu_id			= "menu_01_0300";
+var DATA 		= parent.coreData;
+
+$(document).ready(function(){
+	$( "#tab" ).tabs({
+    	activate: function( event, ui ){
+    		selectedTab = $("#tab").tabs('option', 'active'); 
+			$("#menu").val( selectedTab+1 );
+			
+			/* 해당내용 주석처리 - 20200225 - 조철영차창님 요청
+			parent.coreData.dateCheck(); // 데이터 체크
+			if( parent.coreData.isLoad == false ){
+				alert("개설학과 및 개설과목 정보가 변경됨에 따라 메인화면으로 이동합니다.");
+				location.reload();	
+			}*/
+			
+			gridLecture('N');
+			
+    		if(selectedTab == 0){ 	// 소망가방
+    			$("#gridLecture_id").hide();
+    			$("#gridBasket_id").show();
+    			gridBasket();
+    		}else if(selectedTab == 1){ 	// 교양
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			$("#div_cd").val("C");
+    		} else if(selectedTab == 2){	// 전공
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			$("#div_cd").val("M");
+    		} else if(selectedTab == 3){	// 교직
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			setTimeout(function(){loadTeachCombo('ko');},100);
+    			$("#div_cd").val("T");
+    		} else if(selectedTab == 4){	// 연계(융합)
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			setTimeout(function(){loadConnectCombo('ko');},100);
+    			$("#div_cd").val("N");
+    		} else if(selectedTab == 5){	// ROTC
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			$("#div_cd").val("R");    		
+    		} else if(selectedTab == 6){	// 일반대학원
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			setTimeout(function(){loadGradeUnivCombo('ko');},100);
+    			$("#div_cd").val("G");
+    		} else if(selectedTab == 7){	// 기타대학원
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			setTimeout(function(){loadSpecialUnivCombo('ko');},100);
+    			$("#div_cd").val("S");
+    		} else if(selectedTab == 8){	// 외국어 강좌 전용
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			$("#div_cd").val("L");
+    		} else if(selectedTab == 9){	// 외국인전용
+    			$("#gridLecture_id").show();
+    			$("#gridBasket_id").hide();
+    			$("#div_cd").val("F");	
+    		}else{
+    			alert("탭 메뉴를 알 수 없습니다.");
+    			extendTimer();
+    			return;
+    		}
+    		extendTimer();
+    	}		
+    });	
+	
+	/*  해당내용 주석처리 - 20200225 - 조철영차창님 요청
+	parent.coreData.dateCheck(); // 데이터 체크
+	if( parent.coreData.isLoad == false ){
+		alert("개설학과 및 개설과목 정보가 변경됨에 따라 메인화면으로 이동합니다.");
+		location.reload();	
+	}*/
+	
+	gridLecture('N');
+	// 빠른 수강 
+	$("#span_isu_cd").hide();
+	loadFastUnivCombo('ko');
+	//학부생만 소망가방 보여준다
+		
+		gridBasket();
+		
+	gridSugang();
+	extendTimer();	
+});
+
+function gridLecture(initYn) {
+	//var p_height 		= initGetGridHeight("gridLecture", menu_id, selectedTab, openInfo);	// 화면비율에 맞춘 초기 height
+	var p_height 		= "500px";
+	var menu 			= $("#menu").val(); // 선택메뉴   		
+	var div_cd			= $("#div_cd").val();  // 구분
+	var lectUrl			= urlLectListJson;			
+	var jungong_cd		= "";
+	
+	if( initYn == "Y" ){
+		// 교양
+		if( div_cd == "C" ){
+			if( div_cd == "C" && $("#gyoyang_campus_cd").val() == "00000" ){
+				$("#gyoyang_campus_cd").focus();
+				msgAlert("캠퍼스를 선택하세요.");
+				return;
+			}
+			if( div_cd == "C" && $("#gyoyang_area").val() == "00000" ){
+				$("#gyoyang_area").focus();
+				msgAlert("영역을 선택하세요.");
+				return;
+			}
+			if( div_cd == "C" && $("#gyoyang_gwamok").val() == "00000" ){
+				$("#gyoyang_gwamok").focus();
+				msgAlert("과목을 선택하세요.");
+				return;
+			}	
+			lectUrl	= urlLectListJson+"&gyoyang_campus_cd="+$("#gyoyang_campus_cd").val()+"&gyoyang_area="+$("#gyoyang_area").val()+"&gyoyang_gwamok="+$("#gyoyang_gwamok").val();
+			
+		// 전공	
+		}else if( div_cd == "M" ){
+			if( div_cd == "M" && $("#campus_cd").val() == "00000" ){			
+				$("#campus_cd").focus();
+				msgAlert("캠퍼스를 선택하세요.");
+				return;
+			}
+			
+			if( div_cd == "M" && $("#daehak_cd").val() == "00000" ){
+				$("#daehak_cd").focus();
+				msgAlert("대학을 선택하세요.");
+				return;
+			}
+			
+			if( div_cd == "M" && $("#hakgwa_cd").val() == "00000" ){
+				$("#hakgwa_cd").focus();
+				msgAlert("학과를 선택하세요.");
+				return;
+			}
+			//전공에 값이 없으면 학과를 전공으로 변경한다.
+			if(document.form.major_cd.value == "00000"  || document.form.major_cd.value == "")	jungong_cd = document.form.hakgwa_cd.value;
+			else jungong_cd = document.form.major_cd.value;
+			
+			lectUrl	= urlLectListJson+"&jungong_cd="+jungong_cd;
+			
+		// 교직	
+		}else if( div_cd == "T" ){
+			if( div_cd == "T" && $("#teaching_gwamok_cd").val() == "00000" ){
+				$("#teaching_gwamok_cd").focus();
+				msgAlert("과목을 선택하세요.");
+				return;
+			}
+			lectUrl	= urlLectListJson+"&teaching_gwamok_cd="+$("#teaching_gwamok_cd").val();
+			
+		// 연계(융합)	
+		}else if( div_cd == "N" ){
+			if( $("#connect_gwamok_cd").val() == "00000"){
+				msgAlert("구분을 선택하세요.");
+				return;
+			}	
+			lectUrl	= urlLectListJson+"&connect_gwamok_cd="+$("#connect_gwamok_cd").val();
+			
+		// ROTC	
+		}else if( div_cd == "R" ){
+			lectUrl	= urlLectListJson;
+		// 일반대학원	
+		}else if( div_cd == "G" ){
+			if(div_cd == "G" && $("#grade_daehak_cd").val() == "00000"){			
+				$("#grade_daehak_cd").focus();
+				msgAlert("대학원을 선택하세요.");
+				return;		
+			}
+			/*if(div_cd == "G" && $("#grade_hakgwa_cd").val() == "00000"){			
+				$("#grade_hakgwa_cd").focus();
+				msgAlert("학과를 선택하세요.");
+				return;		
+			}
+			if(div_cd == "G" && $("#grade_gwajung_cd").val() == "00000"){			
+				$("#grade_gwajung_cd").focus();
+				msgAlert("과정을 선택하세요.");
+				return;		
+			}*/
+			
+			//과정 >  전공 > 대학원
+			if(document.form.grade_gwajung_cd.value == "00000" || document.form.grade_gwajung_cd.value == ""){
+				if(document.form.grade_hakgwa_cd.value == "00000" || document.form.grade_hakgwa_cd.value == ""){
+					jungong_cd = document.form.grade_daehak_cd.value;
+				}else{
+					jungong_cd = document.form.grade_hakgwa_cd.value;
+				}
+			}else{
+				jungong_cd = document.form.grade_gwajung_cd.value;
+			}
+			
+			lectUrl	= urlLectListJson+"&jungong_cd="+jungong_cd;
+			
+		// 특수대학원	
+		}else if( div_cd == "S" ){
+			if(div_cd == "S" && $("#special_daehak_cd").val() == "00000"){			
+				$("#special_daehak_cd").focus();
+				msgAlert("대학원을 선택하세요.");
+				return;		
+			}
+			/*if(div_cd == "S" && $("#special_hakgwa_cd").val() == "00000"){			
+				$("#special_hakgwa_cd").focus();
+				msgAlert("학과를 선택하세요.");
+				return;		
+			}
+			if(div_cd == "S" && $("#special_major_cd").val() == "00000"){			
+				$("#special_major_cd").focus();
+				msgAlert("전공을 선택하세요.");
+				return;		
+			}*/
+			
+			//전공 >  학과  > 대학원
+			if(document.form.special_major_cd.value == "00000" || document.form.special_major_cd.value == ""){
+				if(document.form.special_hakgwa_cd.value == "00000" || document.form.special_hakgwa_cd.value == ""){
+					jungong_cd = document.form.special_daehak_cd.value;
+				}else{
+					jungong_cd = document.form.special_hakgwa_cd.value;
+				}
+			}else{
+				jungong_cd = document.form.special_major_cd.value;
+			}
+			
+			lectUrl	= urlLectListJson+"&jungong_cd="+jungong_cd;
+			
+		// 외국어 강좌 전용	
+		}else if( div_cd == "L" ){
+			lectUrl	= urlLectListJson;
+		// 외국인전용	
+		}else if( div_cd == "F" ){
+			lectUrl	= urlLectListJson;
+		}
+	}
+	
+	lectUrl = lectUrl + "&menu=" + menu + "&initYn=" + initYn + "&div_cd=" + div_cd; 
+		
+  	var formData = $("#form").serialize();
+  	$("#gridLecture").GridUnload();
+  	
+	$("#gridLecture").jqGrid({
+		url : lectUrl,
+   		datatype: "json",
+   		//data:formData, 
+   		colModel: [
+   			{label:"신청", name:"mode", id:"mode", width:"80",align:"center",formatter:function(cellvalue, options, row){
+				return '<button type="button" class="sm main">신청</button>';
+   			}}
+   			,{label:"과목번호", name:"gwamok_no", id:"gwamok_no", width:"80",align:"center"}
+   			,{label:"학수코드", name:"haksu_cd", id:"haksu_cd", width:"80",align:"center"}
+   			,{label:"과목명", name:"gwamok_kname", id:"gwamok_kname", width:"250", align:"left",sortable:true, firstsortorder:"desc",formatter:function(cellVal, options, row){   				
+   				$("#jqgh_gridLecture_gwamok_kname > .s-ico").show();
+   				return row.gwamok_kname;
+   			}}
+   			,{label:"학년", name:"haknyun", id:"haknyun", width:"70", align:"center",sortable:true, firstsortorder:"desc",formatter:function(cellVal, options, row){   				
+   				$("#jqgh_gridLecture_haknyun > .s-ico").show();
+   				return row.haknyun;
+   			}}
+   			,{label:"이수구분", name:"isu_name", id:"isu_name", width:"70",align:"center"}
+   			,{label:"학점", name:"hakjum", id:"hakjum", width:"70", align:"center",sortable:true, firstsortorder:"desc",formatter:function(cellVal, options, row){   				
+   				$("#jqgh_gridLecture_hakjum > .s-ico").show();
+   				return row.hakjum;
+   			}}
+   			,{label:"담당교수", name:"prof_name", id:"prof_name", width:"150",align:"left"}
+   			,{label:"교시", name:"sigan", id:"sigan", width:"150",align:"left"}
+   			,{label:"비고", name:"bigo", id:"bigo", width:"150",align:"center"}
+   			,{label:"공학인증", name:"", id:"", width:"150",align:"center"}
+   			,{label:"params", name:"params", id:"params", hidden:true}
+   		],
+   		//width:"auto",			// 화면에 맞춘다. autowidth와 같이 사용못함
+   		height: p_height,
+   		autowidth:true,			// 화면에 맞춘다. - 세로 강제 스크롤 하려면 이거 주석
+   		shrinkToFit: false,  	// 컬럼이 그리드 width에 맞춰 자동으로 맞춰질지 여부 - 스크롤바 생기는지 여부
+   		altRows: true,			// 커서를 맞추면 
+   		//sortname: "name",
+   		gridview: true,
+   		rownumbers: true,
+   		rownumWidth: 40,
+   		rowNum: -1,
+   		//loadui : 'block',
+   		loadtext : "Loading ...",
+   		cmTemplate: {sortable:false}, // sort를 못하도록
+   		sortorder   : 'asc',
+   		// sort icon click event 
+   	    onSortCol: function (index, idxcol, sortorder) {
+   	    }, 
+   	 onCellSelect:function(rowid,iCol,cellcontent,e){
+	   		var cm 			= $(this).jqGrid('getGridParam', 'colModel');
+			var colName 	= cm[iCol];
+			var rowData  	= $(this).jqGrid('getRowData', rowid);
+			
+			var lec_nm 		= rowData.gwamok_kname;
+			var params 		= rowData.params;			
+			
+			if(colName['name'] == 'mode' && $(e.target).is(":button") ){				
+	        	var status = rowData.mode.replace(/(<([^>]+)>)/ig,"");
+	        	if( status != "완료" ){
+	        		goMode(lec_nm, params, rowid, "insert", "N");
+				}	
+			}
+	    },
+   		loadBeforeSend:function(){	
+			//$(".wrap-loader").show();
+		},
+   		loadComplete: function(data) {
+   			var isValid = gridCheck(data, $(this));
+   			if(isValid){
+	   			//$(".wrap-loader").hide();
+	   			getCredit($(this),'meta_1'); 
+	   			if( initYn == "N" ){ 
+	   				setNodata($(this),"조회조건을 선택 후 조회버튼을 클릭하여 조회해주세요");
+	   			}else{
+	   				setNodata($(this),"데이터가 존재하지 않습니다.");
+	   			}	   			
+	   		}
+   			$(this).jqGrid("setLabel", "rn", "No");
+   			// Size 제어
+   			//winResize();
+   		},
+        loadError: function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.responseText); 
+            //alert('HTTP status code: ' + jqXHR.status + '\n' + 'textStatus: ' + textStatus + '\n' + 'errorThrown: ' + errorThrown);
+            //console.log('HTTP message body (jqXHR.responseText): ' + '\n' + jqXHR.responseText);
+            //jQuery("#grid").html("Type: "+ textStatus +"; Response: "+ jqXHR.status + " " + jqXHR.statusText);
+        }
+   	});
+	// 스크롤 생기게 강제로 리사이징
+	setGridSize("gridLecture");
+	$(window).bind('resize', function() {
+   		setGridSize("gridLecture");
+   	}).trigger('resize');
+}
+function gridBasket() {
+	$("#gridBasket").GridUnload();
+	//var p_height 	= initGetGridHeight("gridBasket", menu_id, selectedTab, openInfo);	// 화면비율에 맞춘 초기 height
+	var p_height 	= "500px";
+	
+	$("#gridBasket").jqGrid({
+   		url : urlSugangBasketListJson,
+		datatype: "json",
+   		colModel: [
+   			{label:"신청", name:"mode", id:"mode", width:"60",align:"center",formatter:function(cellvalue, options, row){
+				return '<button type="button" class="sm main">신청</button>';
+   			}}
+   			,{label:"일괄처리", name:"transfer_gb", id:"transfer_gb", width:"100",align:"center"}
+   			,{label:"구분", name:"save_gb_nm", id:"save_gb_nm", width:"100",align:"center"}
+   			,{label:"조직구분", name:"jojik_gb_name", id:"jojik_gb_name", width:"100",align:"center"}
+   			,{label:"개설전공", name:"gwamok_sosok", id:"gwamok_sosok", width:"250",align:"left"}
+   			,{label:"과목번호", name:"gwamok_no", id:"gwamok_no", width:"80",align:"center"}
+   			,{label:"학수코드", name:"haksu_cd", id:"haksu_cd", width:"80",align:"center"}
+   			,{label:"과목명", name:"gwamok_kname", id:"gwamok_kname", width:"220",align:"left"}
+   			,{label:"학년", name:"haknyun", id:"haknyun", width:"50",align:"center"}
+   			,{label:"학점", name:"hakjum", id:"hakjum", width:"50",align:"center"}
+   			,{label:"담당교수", name:"prof_name", id:"prof_name", width:"120",align:"center"}   			
+   			,{label:"교시", name:"sigan", id:"sigan", width:"180",align:"left"}
+   			,{label:"변경사항", name:"chg", id:"chg", width:"150",align:"center",formatter:function(cellvalue, options, row){
+   				var result_text = "";
+   				var check = "N";
+   				if(row.judamdang_gyosu_pre != row.judamdang_gyosu){
+   					result_text += "<a href=\"javascript:prof_change(";
+   					result_text += "'"+row.prof_name_pre+"',";
+   					result_text += "'"+row.prof_name+"'";
+   					result_text += "); \" <span style=\"color:red \">교수변경</a></span>";
+   					check = "Y";
+				}
+   				
+   				if(row.sigan_pre != row.sigan){
+   					if(check == "Y"){
+   						result_text += "<br/><a href=\"javascript:sigan_change(";
+   	   					result_text += "'"+row.sigan_pre+"',";
+   	   					result_text += "'"+row.sigan_trim+"'";
+   	   					result_text += "); \" <span style=\"color:red \">시간변경</a></span>";
+   					}else{
+   						result_text += "<a href=\"javascript:sigan_change(";
+   	   					result_text += "'"+row.sigan_pre+"',";
+   	   					result_text += "'"+row.sigan_trim+"'";
+   	   					result_text += "); \" <span style=\"color:red \">시간변경</a></span>";
+   					}
+   				}
+   				return result_text;
+   			}}
+   			,{label:"재수강", name:"retake_yn", id:"retake_yn", width:"100",align:"center"}
+   			,{label:"비고", name:"bigo", id:"bigo", width:"150",align:"center"}
+   			,{label:"공학인증", name:"abeek", id:"abeek", width:"100",align:"center"}   			   			
+   			,{label:"judamdang_gyosu_pre", name:"judamdang_gyosu_pre", id:"judamdang_gyosu_pre", hidden:true}
+   			,{label:"judamdang_gyosu", name:"judamdang_gyosu", id:"judamdang_gyosu", hidden:true}
+   			,{label:"sigan_pre", name:"sigan_pre", id:"sigan_pre", hidden:true}
+   			,{label:"sigan", name:"sigan", id:"sigan", hidden:true}
+   			,{label:"sigan_trim", name:"sigan_trim", id:"sigan_trim", hidden:true}
+   			,{label:"prof_name_pre", name:"prof_name_pre", id:"prof_name_pre", hidden:true}
+   			,{label:"gaesul_status", name:"gaesul_status", id:"gaesul_status", hidden:true}
+   			,{label:"save_gb", name:"save_gb", id:"save_gb", hidden:true}
+   			,{label:"gwamok_no", name:"gwamok_no", id:"gwamok_no", hidden:true}
+   			,{label:"params", name:"params", id:"params", hidden:true}
+   		],
+   		//width:"auto",		// 화면에 맞춘다. autowidth와 같이 사용못함
+   		height: p_height,
+   		autowidth:true,		// 화면에 맞춘다.
+   		shrinkToFit: false,  // 컬럼이 그리드 width에 맞춰 자동으로 맞춰질지 여부 - 스크롤바 생기는지 여부
+   		altRows: true,		// 커서를 맞추면
+   		//sortname: "lectname",
+   		gridview: true,
+   		//loadui : 'block',
+   		loadtext : "Loading ...",
+   		rownumbers: true,
+   		rownumWidth: 40,
+   		rowNum: -1,
+   		cmTemplate: {sortable:false}, // sort를 못하도록
+   		onCellSelect:function(rowid,iCol,cellcontent,e){
+   			var cm = $(this).jqGrid('getGridParam', 'colModel');
+			var colName = cm[iCol];
+			var rowData  = $(this).jqGrid('getRowData', rowid); 
+			
+			var lec_nm 		= rowData.gwamok_kname;
+			var params 		= rowData.params;
+			var lb_gyosu 	= false;
+			var lb_sigan 	= false;
+			var msg			= "";
+			
+			if(colName['name'] == 'mode' && $(e.target).is(":button") ){				
+	        	var status = rowData.mode.replace(/(<([^>]+)>)/ig,"");
+	        	if( status != "완료" ){
+	        		if(rowData.judamdang_gyosu_pre != rowData.judamdang_gyosu ){
+	        			lb_gyosu = true;
+	        		}
+	        		if(rowData.sigan_pre != rowData.sigan ){
+	        			lb_sigan = true;
+	        		}
+	        		if(lb_gyosu == true ){ lb_gyosu = "Y"; }else{ lb_gyosu = "N"; } 
+	        		if(lb_sigan == true ){ lb_sigan = "Y"; }else{ lb_sigan = "N"; }
+	        		
+	        		if(lb_gyosu == "Y" && lb_sigan == "Y") {
+	        			msg = "교수정보가 [" + rowData.prof_name_pre + "] 에서 [" +  rowData.prof_name + "]로 변경되었습니다!\n"
+							+ "시간정보가 [" + rowData.sigan_pre + "] 에서 [" +  rowData.sigan + "]로 변경되었습니다!\n\n"
+							+ "[ 과목코드:"+rowData.gwamok_no + "] 과목을 신청 하시겠습니까?";
+	        			if(!confirm(msg))  return;
+	        		}else if(lb_gyosu == "Y"){		
+	        			msg = "교수정보가 [" + rowData.prof_name_pre + "] 에서 [" +  rowData.prof_name + "]로 변경되었습니다!\n\n"					
+	        					+ "[ 과목코드:"+rowData.gwamok_no + "] 과목을 신청 하시겠습니까?";
+	        			if(!confirm(msg))  return;	
+	        		}else if(lb_sigan == "Y"){
+	        			msg = "시간정보가 [" + rowData.sigan_pre + "] 에서 [" +  rowData.sigan + "]로 변경되었습니다!\n\n"
+	        					+ "[ 과목코드:"+rowData.gwamok_no + "] 과목을 신청 하시겠습니까?";
+	        			if(!confirm(msg))  return;	
+	        		}else{				
+	        			if(!confirm("[ 과목코드:"+rowData.gwamok_no + "] 과목을 신청 하시겠습니까?"))  return;				
+	        		}
+	        		
+	        		goMode(lec_nm, params, rowid, "insert", "N");
+				}	
+			}
+	    },
+   		loadComplete: function(data) {
+   			var isValid = gridCheck(data, $(this));
+   			if(isValid){
+	   			setNodata($(this),"소망가방 신청 내역이 없습니다.");
+	   			getCredit($(this),'meta_2');
+	   			//winResize();
+	   		}
+   			$(this).jqGrid("setLabel", "rn", "No");
+   			
+   			// 재수강, 일괄처리, 공학인증 항목이 하나라도 Y이면, 백그라운드 컬러 변경 -- 20200209 - 조철영차장님 요청
+   			var rowIDs = $(this).jqGrid('getDataIDs');
+   			for (var i = 0; i < rowIDs.length ; i++){
+				var rowID = rowIDs[i];
+				var rowData = $(this).jqGrid ('getRowData', rowID);
+				// 예비과목 tr 색주기(재수강,공학인증,일괄처리가 Y인경우)
+				if(rowData.retake_yn == "Y" || rowData.abeek == "Y" || rowData.transfer_gb == "Y" ){				
+					$(this).find("tbody").find("tr").eq(rowID).css("background-color","#e1f4c3");
+				}
+				$(this).jqGrid('setRowData', rowID,rowData);
+	        }
+   		}
+   	});
+	// 스크롤 생기게 강제로 리사이징
+	setGridSize("gridBasket");
+	$(window).bind('resize', function() {
+   		setGridSize("gridBasket");
+   	}).trigger('resize');
+}
+function gridSugang() {	
+	$("#gridSugang").GridUnload();
+	//var p_height 	= initGetGridHeight("gridSugang", menu_id, selectedTab, openInfo);	// 화면비율에 맞춘 초기 height
+	var p_height 	= "400px";
+	$("#gridSugang").jqGrid({
+   		url : urlSugangListJson,
+		datatype: "json",
+   		colModel: [
+   			{label:"삭제", name:"mode", id:"mode", width:"80",align:"center",formatter:function(cellvalue, options, row){
+				return '<button type="button" class="sm red">삭제</button>';
+   			}}
+   			,{label:"캠퍼스", name:"campus_nm", id:"campus_nm", width:"110",align:"center"}
+   			,{label:"과목번호", name:"gwamok_no", id:"gwamok_no", width:"100",align:"center"}
+   			,{label:"과목명", name:"gwamok_kname", id:"gwamok_kname", width:"200",align:"left"}
+   			,{label:"교시", name:"sigan", id:"sigan", width:"120", align:"center"}
+   			,{label:"이수구분", name:"isu_gb_name", id:"isu_gb_name", width:"80",align:"center"}
+   			,{label:"학점", name:"hakjum", id:"hakjum", width:"50",align:"center"}
+   			,{label:"담당교수", name:"prof_name", id:"prof_name", width:"150",align:"center"}
+   			,{label:"재수강", name:"retake_yn", id:"retake_yn", width:"100",align:"center"}
+   			,{label:"비고", name:"bigo", id:"bigo", width:"100",align:"center"}
+   			,{label:"공학인증", name:"abeek", id:"abeek", width:"100",align:"center"}
+   			,{label:"대기순위", name:"yh_gb", id:"yh_gb", width:"100",align:"center",formatter:function(cellvalue, options, row){
+   				if(row.yuhyo_gb == "3"){
+   					return row.yh_gb + "<b><span style='color:red'>("+row.wait_no+"순위)</span><b>";
+				}else{					
+					return row.yh_gb;
+				}
+   			}}
+   			,{label:"params", name:"params", id:"params", hidden:true}
+   		],
+   		//width:"auto",		// 화면에 맞춘다. autowidth와 같이 사용못함
+   		height:p_height,
+   		autowidth:true,		// 화면에 맞춘다. - 세로 강제 스크롤 하려면 이거 주석
+   		shrinkToFit: false,  // 컬럼이 그리드 width에 맞춰 자동으로 맞춰질지 여부 - 스크롤바 생기는지 여부
+   		altRows: true,		// 커서를 맞추면
+   		//sortname: "lectname",
+   		gridview: true,
+   		//loadui : 'block',
+   		loadtext : "Loading ...",
+   		rownumbers: true,
+   		rownumWidth: 40,
+   		rowNum: -1,
+   		cmTemplate: {sortable:false}, // sort를 못하도록
+   		onCellSelect:function(rowid,iCol,cellcontent,e){
+	    	var cm 		 = $(this).jqGrid('getGridParam', 'colModel');
+			var colName  = cm[iCol];
+			var rowData  = $(this).jqGrid('getRowData', rowid);
+			
+			var lec_nm = rowData.gwamok_kname;
+			var params = rowData.params;
+			
+			if(colName['name'] == 'mode' && $(e.target).is(":button")){
+	        	// 삭제
+	        	goMode(lec_nm, params, rowid, "delete", "N");
+			}
+	    },
+   		loadComplete: function(data) {
+   			var isValid = gridCheck(data, $(this));
+   			if(isValid){				
+   				setNodata($(this),"수강신청 내역이 없습니다.");   				
+	   			getCredit($(this),'meta_3'); 
+	   			//winResize();
+	   		}
+   			$(this).jqGrid("setLabel", "rn", "No");
+   		}
+   	});
+	// 스크롤 생기게 강제로 리사이징
+	setGridSize("gridSugang");
+	$(window).bind('resize', function() {
+   		setGridSize("gridSugang");
+   	}).trigger('resize');
+}
+function goMode(lec_nm, params, rowid, mode, retake_yn){
+	if(mode == "insert"){
+		okMode(lec_nm, params, rowid, mode, retake_yn);
+	}else if(mode == "delete"){
+		msgConfirm(lec_nm, params, rowid, mode, "ko");
+	}else{
+		alert("비정상적인 호출입니다.");
+		return;
+	}
+}
+function okMode( lec_nm, params, rowid, mode, retake_yn, reSugang_key, ticket ){
+	/*
+		@g0pher
+		소망가방에 담겨있는 "0711 직무역량특별강좌" 수강신청 버튼 클릭 시 호출됨.
+		다음과 같은 인자를 받음
+
+		params가 특이한데, 소망가방 List에서 [aria-describedby="gridBasket_params"]인
+		항목이 데이터를 가지고 있음.
+		
+		학부(=01)@과목번호@대학(?)
+		ex) 01@1539@7586 -> '인공지능'
+		ex) 01@0711@1253 -> '소망가방에 담겨있던 직무역량특별강좌'
+		와 같은 형태이며, 추가 선택은 '인공지능' 수업 선택 시 나왔던 것으로 기억됨.
+		아마도 해당 과목 운영 대학을 선택하는 것이었을텐데, 그것일 것임.
+
+		검색으로 수강신청할 때는 마지막 항목이 0000으로 채워지는 것으로 보아 동일코드의 과목이 아니면
+
+
+		[직무역량특별강좌, 01@0711@1253, 1, insert, N, undefined, undefined]
+	*/
+
+	// @g0pher
+	console.log(lec_nm, params, rowid, mode, retake_yn, reSugang_key, ticket)
+
+	var menu = $("#menu").val(); // 선택메뉴
+	$("#retake").dialog();
+	if($("#retake").dialog("isOpen")){
+		$("#retake").dialog("close");
+	}
+	extendTimer();
+	
+	$.ajax({
+		type: "POST",
+		url: urlSugangMode +"&mode="+mode+"&fake="+Date.now(),
+		data:{params:params, retake_yn:retake_yn, reSugang_key:reSugang_key, ticket:ticket},
+		async:false,
+		success: function(data) {
+			var tmp = eval("("+data+")");
+			var code = tmp.code;
+			var msg  = tmp.msg;		
+
+			if( code == "-1" || code == "500" ){	// -1을 에러라 지칭한다. / 500
+				msgAlert(tmp.msg);
+			
+				$("#gwamok_cd2").val("");
+				$("#isu_cd").val("00000");
+				$("#span_isu_cd").hide();	//document.all.span_isu_cd.style.display = "none";
+				
+				return;
+			}else if(code == "5" ){	//이수구분처리
+				$("#gwamok_cd2").val( tmp.gwamok_cd );
+			
+				for(var i=0; i<document.form.univ_cd.length; i++){
+					if( document.form.univ_cd[i].value == tmp.univ_cd ){					
+						document.form.univ_cd[i].selected = true;
+						break;
+					}
+				}
+				$("#span_isu_cd").show(); 	// document.all.span_isu_cd.style.display = "block";  -- 이거 일단 주석처리함
+				document.form.isu_cd.focus();				
+				// 빠른수강신청 콤보 불러오기
+				loadFastIsuCombo(tmp.isu_cd, tmp.isu_cd2); // 이수구분 콤보 불러오기
+				msgAlert(tmp.msg);				
+			}else if(code == "6"){	//멀티로그온 로그아웃
+				msgAlert(tmp.msg);
+				logout(msg);
+			}else if(code == "9"){
+				msgAlert(tmp.msg);
+				logout(msg);	
+			}else if(code == "MACRO"){	//매크로
+				macroChk(params, rowid, mode, msg);
+			}else if(code == "500"){
+				msgAlert(tmp.msg);
+				return;
+			}else{
+				if(mode == 'insert'){
+					msgAlertRandom(msg);
+				}else{
+					msgAlert(msg);
+				}
+				$("#gwamok_cd2").val("");
+				$("#isu_cd").val("00000");
+				$("#span_isu_cd").hide();	//document.all.span_isu_cd.style.display = "none";
+				
+				$("#gridSugang").trigger("reloadGrid");				
+			}	
+		},
+		error: function(req, status, error){
+			alert("code:"+req.status+"\n"+"message:"+req.responseText+"\n"+"error:"+error);
+		}
+	});
+	extendTimer();
+}
+function fastSave(){	
+	// 원래는 DB에서 가져오는 것이나 경기대 특성상 만들어서 보내야할듯
+	var params	= "";
+	var isu_cd  = $("#isu_cd").val()
+	if( $("#univ_cd").val() == "00000" ){
+		//msgAlert("학부 대학원 구분을 선택하세요.");
+		alert("학부 대학원 구분을 선택하세요.");
+		document.form.univ_cd.focus();
+		return;
+	}
+	if( $("#gwamok_cd2").val() == "" ){
+		//msgAlert("과목코드를 입력해 주세요.");
+		alert("과목코드를 입력해 주세요.");
+		document.form.gwamok_cd2.focus();
+		return;
+	}
+	
+	$("#gwamok_cd").val( $("#gwamok_cd2").val() );
+	$("#gwamok_cd2").val("");
+	$("#gwamok_cd2").focus();
+	// 이수구분이 없다면 00000
+	params =  $("#univ_cd").val() + "@" + $("#gwamok_cd").val() + "@" + isu_cd;
+	
+	okMode( "", params, "", "insert", "N" );
+}
+
+function macroChk(params, rowid, mode, ticket, reSugang_key){
+	$("#secNumber").val("");
+	$("#macro").dialog({
+		resizable: false,
+		width: 570,
+		height: 320,
+		modal: true,
+		closeOnEscape: false,
+		resizable: false,
+        draggable: true,
+        beforeClose: function() {
+        	$(".ui-dialog-titlebar-close").show();
+        	//$(this).empty();
+        },
+        open: function(event, ui) {
+        	//$(".ui-dialog-titlebar-close", $(this).parent()).hide(); 닫기버튼 감추기
+            $("#secNumber").focus();
+            $('#macro').load(urlSugangMacro, {params:params, rowid:rowid, mode:mode, ticket:ticket, reSugang_key:reSugang_key, fake:Date.now()}, function() {
+            	$("#secNumber").focus()
+ 				imgInit();
+ 				initSize();// 화면 사이즈를 작게 했을 경우 입력 화면이 보이도록 조절
+ 		     });
+	    }
+	});// end dialog
+}
+function gridCheck(data, grid){
+	try{
+			var code = data.code || data.rows[0].code;
+			var msg = data.msg || data.rows[0].msg;
+			if(code == "999"){
+				logout(msg);
+				return false;
+			}else if(code == "500"){
+				setNodata(grid, msg);
+				//msgAlert(msg);
+				return false;
+			}
+		}catch(err){	
+		}
+	return true;	
+}
+function getCredit(grid, gbn){
+	var maxPnt 		= "20";
+	var rowIDs 		= grid.jqGrid('getDataIDs');
+	var suHakjum 	= 0;
+	var suCnt	 	= 0;
+	
+	var bsHakjum 	= 0;
+	var yebiHakjum 	= 0;
+	var bsCnt	 	= 0;
+	var totCredit 	= 0;
+	
+	var count = rowIDs.length;
+    for (var i = 0; i < count ; i++){
+        var rowID = rowIDs[i];
+        var rowData = grid.jqGrid ('getRowData', rowID);
+        suHakjum += parseFloat(rowData.hakjum);
+        if(rowData.gaesul_status == "N"){
+        	if(rowData.save_gb == "1" ){
+        		bsHakjum += parseFloat(rowData.hakjum);      		
+        	}else{
+        		yebiHakjum += parseFloat(rowData.hakjum);
+        	}
+        }
+        bsCnt++;
+        suCnt++;
+    }
+    if(gbn == 'meta_1'){
+    	$("#meta_1").html("<label>총 조회건수</label><span><em>"+suCnt+"</em>건</span>");
+    }else if(gbn == 'meta_2'){
+    	var meta_2 = "<label>본 과목</label><span><em>"+bsHakjum+"</em>학점</span>"
+    					+ "<label>예비과목</label><span><em>"+yebiHakjum+"</em>학점</span>";
+    	$("#meta_2").html(meta_2);    					
+    }else if(gbn == 'meta_3'){
+    	var meta_3 =  "<label>현재 신청학점</label><span><em>"+suHakjum+"</em>학점</span>";
+    	$("#meta_3").html(meta_3);
+    }
+}
+function menuControl( grid_id, obj, title, sgTitle ){
+	var title1 = title.replace("Fold out","Fold");
+	var title2 = title.replace("Fold","Fold out");
+	
+	if($("#gview_"+grid_id).css("display") == "none"){		
+		openInfo = "open";
+		//$("#gview_"+grid_id).show(800);
+		$("#gview_"+grid_id).slideDown(800);
+		$("#"+sgTitle).html( title1 );
+		$("#"+obj).attr("src","/resources/img/close.png").attr("title", title1);
+	}else{		
+		openInfo = "close";
+		//$("#gview_"+grid_id).hide(800);
+		$("#gview_"+grid_id).slideUp(800);
+		$("#"+sgTitle).html( title2 );
+		$("#"+obj).attr("src","/resources/img/open.png").attr("title",title2);
+	}
+	// 시간표 그리드 접기 
+	if($("#gview_gridWaitSugang").css("display") == "none"){
+		//$("#gview_"+grid_id).show(800);
+		$("#gview_gridWaitSugang").slideDown(800);
+	}else{
+		//$("#gview_"+grid_id).hide(800);
+		$("#gview_gridWaitSugang").slideUp(800);
+	}
+	// 장바구니 셋팅
+	$('#gridBasket').jqGrid('setGridHeight', initGetGridHeight("gridBasket", menu_id, selectedTab, openInfo));
+	$('#gridLecture').jqGrid('setGridHeight', initGetGridHeight("gridLecture", menu_id, selectedTab, openInfo));
+	//setGridSize("gridBasket");
+	//setGridSize("gridSugang");
+	//setGridSize("gridWaitSugang");
+}
+function prof_change( prof_nm_pre, prof_nm ) {
+	msgAlert("교수 정보가 [" + prof_nm_pre + "] 에서 [" +  prof_nm + "]로 변경되었습니다!" );
+}
+function sigan_change(sigan_pre,sigan) {
+	msgAlert("시간표 정보가 [" + sigan_pre + "] 에서 [" +  sigan + "]로 변경되었습니다!" );
+}
+//경기대에서는 사용하지 않음
+function btnChange(str, mode){
+	//var res = str.split("@");
+	//params = res[0]+"-"+res[1];
+	var ids = $("#gridBasket").getDataIDs();
+	// Grid Data Get!
+	$.each(ids,function(idx, rowID){
+		rowData = $("#gridBasket").getRowData(rowID);
+		if (rowData.params == str) {
+			if(mode == 'insert'){
+				rowData.mode = "<span style='color:red'>완료</span>";
+				rowData.sugang_yn = "Y";
+			}else if(mode == 'delete'){
+				rowData.mode = '<button type="button" class="sm main">신청</button>';
+				rowData.sugang_yn = "N";
+			}
+			$('#gridBasket').jqGrid('setRowData', rowID,rowData);
+		}
+	}); 
+}
+/*
+$(window).resize(function() {
+	winResize('resize', openInfo, selectedTab);
+});
+function winResize(delay){
+	initGetGridHeight("gridBasket", menu_id, selectedTab, openInfo);
+	initGetGridHeight("gridLecture", menu_id, selectedTab, openInfo);
+	initGetGridHeight("gridSugang", menu_id, selectedTab, openInfo);
+	//setGridSize("gridBasket", delay);
+}
+*/
+</script></div>
+		
+		
+		
+		<div id="macro" title="매크로 방지용 키입력" style="display:none;"></div>
+		<div id="switDialog" title="착오자 내역" style="display:none;"></div>
+	</div><!-- end div main-frame  -->
+	
+	<!-- 빈 페이지를 호출하기 위한 frame -->
+	<iframe src="./saved_resource(2).html" name="hiddenFrame" id="hiddenFrame" width="0" height="0" frameborder="0"></iframe>
+
+<div tabindex="-1" role="dialog" class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front ui-draggable ui-resizable" aria-describedby="retake" aria-labelledby="ui-id-33" style="position: absolute; height: auto; width: 300px; top: 568.512px; left: 528.016px; display: none;"><div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix ui-draggable-handle"><span id="ui-id-33" class="ui-dialog-title">재수강 대상 과목조회</span><button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="Close"><span class="ui-button-icon ui-icon ui-icon-closethick"></span><span class="ui-button-icon-space"> </span>Close</button></div><div id="retake" style="width: auto; min-height: 90px; max-height: none; height: auto;" class="ui-dialog-content ui-widget-content"></div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div></div><div tabindex="-1" role="dialog" class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front ui-dialog-buttons ui-draggable" aria-describedby="messages" aria-labelledby="ui-id-34" style="height: auto; width: 400px; top: 301.516px; left: 841px; display: none;"><div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix ui-draggable-handle"><span id="ui-id-34" class="ui-dialog-title">알림(notice)</span><button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="Close"><span class="ui-button-icon ui-icon ui-icon-closethick"></span><span class="ui-button-icon-space"> </span>Close</button></div><div id="messages" style="width: auto; min-height: 24px; max-height: none; height: auto;" class="ui-dialog-content ui-widget-content">
+		  <p class="alert-warning"><span id="msgs">수강인원이 초과되어 수강신청대기 처리 되었습니다! </span></p>
+		</div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button" class="main ui-button ui-corner-all ui-widget">확 인</button></div></div></div><div tabindex="-1" role="dialog" class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front ui-dialog-buttons ui-draggable" aria-describedby="message" aria-labelledby="ui-id-35" style="height: auto; width: auto; top: 540.512px; left: 528.016px; display: none;"><div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix ui-draggable-handle"><span id="ui-id-35" class="ui-dialog-title">알림(notice)</span><button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="Close"><span class="ui-button-icon ui-icon ui-icon-closethick"></span><span class="ui-button-icon-space"> </span>Close</button></div><div id="message" style="z-index: 2; max-width: 550px; width: auto; min-height: 24px; max-height: none; height: auto;" class="ui-dialog-content ui-widget-content">
+		  <p class="alert-warning"><span id="msg">삭제되었습니다!</span></p>
+		</div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button" class="main ui-button ui-corner-all ui-widget">확 인</button></div></div></div></body></html>

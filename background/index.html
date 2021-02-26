@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>거북선생</title>
+        <link rel="stylesheet" href="/background/index.css"></link>
+        <script src="/js/jquery-3.5.1.min.js"></script>
+    </head>
+    <body>
+        <div id="clock">
+            <div id="naver">
+                <p>Naver : <span class="time"></span></p>
+            </div>
+        </div>
+        <img id="main_icon" src="/img/logo_welcome.png" width="200px">
+        <h1>거북선생</h1>
+        <table id="sugang_list" cellpadding="0" cellspacing="0">
+            <thead>
+                <th width="60px">선택</th>
+                <th width="80px">신청</th>
+                <th width="150px">과목번호</th>
+                <th>한줄주석</th>
+                <th>상태</th>
+                <th width="80px">삭제</th>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <div id="appender">
+            <table>
+                <thead>
+                    <th>과목번호</th>
+                    <th>한줄주석</th>
+                    <th>동작</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input name="class_code" type="text" placeholder="ex) 0561"></td>
+                        <td><input name="remark" type="text" placeholder="ex) 프로그래밍기초와실습 수678"></td>
+                        <td><button class="submit">삽입</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="tool">
+            <button id="auto_request_pick">선택항목 자동수강신청</button>
+            <br>
+            <button id="auto_request">자동수강신청</button>
+            <br>
+            <button id="drop">리스트 전체 삭제</button>
+        </div>
+        <script src="/background/timer.js"></script>
+        <script src="/background/list_manager.js"></script>
+    </body>
+</html>

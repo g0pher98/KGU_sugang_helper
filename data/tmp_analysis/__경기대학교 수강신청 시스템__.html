@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- saved from url=(0028)http://sugang.kyonggi.ac.kr/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link rel="shortcut icon" href="http://sugang.kyonggi.ac.kr/resources/img/favicon.ico">
+<script src="./__경기대학교 수강신청 시스템___files/jquery-1.12.4.min.js.다운로드" type="text/javascript"></script>
+<!-- 경기대 중복탭 막기 제거 -20200213 -->
+<!-- 경기대 네퍼넬 없음 제거 -20200213 -->
+<title>::경기대학교 수강신청 시스템::</title>
+<style>
+  body {
+  	margin : 0px;
+  	padding : 0px;
+  }
+</style>
+<script language="JavaScript">
+var context = "";
+$(document).ready(function(){
+});
+function setToken(token) {
+	document.form.token.value = token;
+}
+function getToken() {
+	return document.form.token.value;
+}
+window.onload = function(){
+	//Main.location.href = context + "/login?attribute="+window.IsDuplicate()+"&fake="+Date.now();  -- 경기대는 중복탭 체크하지 않음 -- 20200201
+	Main.location.href = context + "/login?attribute=login"+"&fake="+Date.now();
+}
+</script>
+</head>
+
+<body bgcolor="#FFFFFF">
+<form name="form">
+	<input type="hidden" name="token" id="token" value="kguv_sugang">
+</form>
+<iframe name="Main" id="Main" style="position: absolute; width:100vw; height:100vh; border: none" scrolling="auto" src="./__경기대학교 수강신청 시스템___files/saved_resource.html"></iframe>
+<iframe src="./__경기대학교 수강신청 시스템___files/saved_resource(1).html" name="hiddenFrame" id="hiddenFrame" width="0" height="0" frameborder="0"></iframe>
+
+</body></html>

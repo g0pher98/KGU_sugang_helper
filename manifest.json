@@ -1,15 +1,32 @@
 {
 	"manifest_version": 2,
-	"name": "KGU_SUGANG",
+	"name": "거북선생",
 	"description": "수강신청 도우미",
 	"version": "0.0.1",
+	"icons": {
+		"16": "img/logo_yes.png",
+		"32": "img/logo_yes.png",
+		"48": "img/logo_yes.png",
+		"128": "img/logo_yes.png"
+	},
     "permissions": [
+		"background",
+		"tabs",
         "http://sugang.kyonggi.ac.kr/*"
     ],
+	"browser_action": {
+		"default_icon": "img/logo_yes.png",
+		"default_title": "popup",
+		"default_popup": "popup.html"
+	},
+	"background": {
+		"page": "background/index.html",
+		"persistent": false
+	},
 	"content_scripts": [
 		{
 			"matches": [
-				"http://sugang.kyonggi.ac.kr/"
+				"http://sugang.kyonggi.ac.kr/*"
 			],
 			"js": [
                 "js/jquery-3.5.1.min.js",
