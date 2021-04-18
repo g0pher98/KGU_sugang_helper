@@ -18,6 +18,6 @@ $(function() {
         date = new Date(datetime);
         date.setHours(date.getHours() + 9);
         naver_clock = date;
-        setInterval(update_clock, 1000);
+        setInterval(update_clock, 1000/*임시*/ *1000);
     });
 });

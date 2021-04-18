@@ -30,7 +30,8 @@
 			],
 			"js": [
                 "js/jquery-3.5.1.min.js",
-				"js/time_update.cs.js"
+				"js/sugang/time_update.cs.js",
+				"js/sugang/work.cs.js"
 			]
 		}
 	]
